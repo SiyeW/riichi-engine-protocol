@@ -1,0 +1,212 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:riichi-engine-protocol:schema:engine-manifest:v1",
+  "title": "Riichi Engine Protocol Manifest v1",
+  "type": "object",
+  "required": [
+    "schemaVersion",
+    "id",
+    "name",
+    "version",
+    "protocol",
+    "kinds",
+    "entrypoints",
+    "modelFormats",
+    "capabilities"
+  ],
+  "properties": {
+    "$schema": {
+      "type": "string"
+    },
+    "schemaVersion": {
+      "const": 1
+    },
+    "id": {
+      "type": "string",
+      "pattern": "^[a-z0-9][a-z0-9._-]{2,127}$"
+    },
+    "name": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 128
+    },
+    "version": {
+      "type": "string",
+      "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+(?:[-+][0-9A-Za-z.-]+)?$"
+    },
+    "protocol": {
+      "type": "object",
+      "required": ["name", "major", "minor"],
+      "properties": {
+        "name": {
+          "const": "riichi-engine-protocol"
+        },
+        "major": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "minor": {
+          "type": "integer",
+          "minimum": 0
+        }
+      },
+      "additionalProperties": false
+    },
+    "kinds": {
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": {
+        "enum": ["decision", "opponent-analysis"]
+      }
+    },
+    "entrypoints": {
+      "type": "object",
+      "minProperties": 1,
+      "patternProperties": {
+        "^[a-z0-9]+-[a-z0-9]+$": {
+          "$ref": "#/$defs/entrypoint"
+        }
+      },
+      "additionalProperties": false
+    },
+    "modelFormats": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "$ref": "#/$defs/modelFormat"
+      }
+    },
+    "capabilities": {
+      "type": "object",
+      "required": [
+        "multipleSessions",
+        "incrementalHistory",
+        "cancellation",
+        "reload"
+      ],
+      "properties": {
+        "multipleSessions": {
+          "type": "boolean"
+        },
+        "incrementalHistory": {
+          "type": "boolean"
+        },
+        "concurrentRequests": {
+          "type": "boolean"
+        },
+        "cancellation": {
+          "type": "boolean"
+        },
+        "reload": {
+          "type": "boolean"
+        },
+        "batching": {
+          "type": "boolean"
+        },
+        "rawValues": {
+          "type": "boolean"
+        },
+        "probabilities": {
+          "type": "boolean"
+        },
+        "opponentInputModes": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "contains": {
+            "const": "public"
+          },
+          "items": {
+            "enum": ["public", "full-information"]
+          }
+        }
+      },
+      "additionalProperties": true
+    },
+    "optionsSchema": {
+      "type": "object"
+    },
+    "licenses": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/license"
+      }
+    }
+  },
+  "additionalProperties": false,
+  "$defs": {
+    "relativePath": {
+      "type": "string",
+      "minLength": 1,
+      "pattern": "^(?![A-Za-z]:)(?!/)(?!.*(?:^|/)\\.\\.(?:/|$))(?!.*\\\\).+$"
+    },
+    "entrypoint": {
+      "type": "object",
+      "required": ["executable"],
+      "properties": {
+        "executable": {
+          "$ref": "#/$defs/relativePath"
+        },
+        "arguments": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "maxLength": 4096
+          }
+        }
+      },
+      "additionalProperties": false
+    },
+    "modelFormat": {
+      "type": "object",
+      "required": [
+        "id",
+        "extensions",
+        "inputSchema",
+        "outputSchema"
+      ],
+      "properties": {
+        "id": {
+          "type": "string",
+          "pattern": "^[a-z0-9][a-z0-9._-]{2,127}$"
+        },
+        "extensions": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": {
+            "type": "string",
+            "pattern": "^\\.[A-Za-z0-9][A-Za-z0-9._-]*$"
+          }
+        },
+        "inputSchema": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128
+        },
+        "outputSchema": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128
+        }
+      },
+      "additionalProperties": false
+    },
+    "license": {
+      "type": "object",
+      "required": ["name", "path"],
+      "properties": {
+        "name": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128
+        },
+        "path": {
+          "$ref": "#/$defs/relativePath"
+        }
+      },
+      "additionalProperties": false
+    }
+  }
+}

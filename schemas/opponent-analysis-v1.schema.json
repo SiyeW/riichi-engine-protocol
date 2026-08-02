@@ -1,0 +1,78 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:riichi-engine-protocol:schema:opponent-analysis:v1",
+  "title": "Opponent Analysis Engine Result v1",
+  "type": "object",
+  "required": [
+    "sessionId",
+    "positionId",
+    "historyDigest",
+    "engineFingerprint",
+    "inputMode",
+    "players"
+  ],
+  "properties": {
+    "sessionId": { "type": "string", "minLength": 1 },
+    "positionId": { "type": "string" },
+    "historyDigest": { "type": "string", "pattern": "^sha256:[0-9a-f]{64}$" },
+    "engineFingerprint": { "type": "string", "pattern": "^sha256:[0-9a-f]{64}$" },
+    "inputMode": { "enum": ["public", "full-information"] },
+    "players": {
+      "type": "array",
+      "minItems": 3,
+      "maxItems": 3,
+      "items": {
+        "type": "object",
+        "required": ["seat", "shanten", "furitenOrNoYaku", "ronWaits"],
+        "properties": {
+          "seat": { "type": "integer", "minimum": 0, "maximum": 3 },
+          "shanten": {
+            "type": "array",
+            "minItems": 7,
+            "maxItems": 7,
+            "items": {
+              "type": "object",
+              "required": ["value", "probability"],
+              "properties": {
+                "value": { "type": "integer", "minimum": 0, "maximum": 6 },
+                "probability": { "$ref": "#/$defs/probability" }
+              }
+            }
+          },
+          "furitenOrNoYaku": { "$ref": "#/$defs/probability" },
+          "ronWaits": {
+            "type": "object",
+            "minProperties": 34,
+            "maxProperties": 34,
+            "propertyNames": {
+              "enum": [
+                "1m", "2m", "3m", "4m", "5m", "6m", "7m", "8m", "9m",
+                "1p", "2p", "3p", "4p", "5p", "6p", "7p", "8p", "9p",
+                "1s", "2s", "3s", "4s", "5s", "6s", "7s", "8s", "9s",
+                "E", "S", "W", "N", "P", "F", "C"
+              ]
+            },
+            "additionalProperties": { "$ref": "#/$defs/probability" }
+          }
+        }
+      }
+    },
+    "timing": { "$ref": "#/$defs/timing" }
+  },
+  "$defs": {
+    "probability": {
+      "type": "number",
+      "minimum": 0,
+      "maximum": 1
+    },
+    "timing": {
+      "type": "object",
+      "properties": {
+        "preprocessMs": { "type": "number", "minimum": 0 },
+        "queueMs": { "type": "number", "minimum": 0 },
+        "inferenceMs": { "type": "number", "minimum": 0 },
+        "totalMs": { "type": "number", "minimum": 0 }
+      }
+    }
+  }
+}
