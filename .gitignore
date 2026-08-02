@@ -1,4 +1,7 @@
 __pycache__/
 *.py[cod]
+.conda*/
+.build/
 build/
 dist/
+examples/mock-decision-engine/runtime/

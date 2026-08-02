@@ -1,4 +1,4 @@
-# 公共数据契约 v1
+# 共享数据约定 v1
 
 本文只定义两类引擎共用的字段。业务请求和结果分别由
 [决策引擎规范](decision-engine-v1.md)与[读牌引擎规范](opponent-analysis-engine-v1.md)

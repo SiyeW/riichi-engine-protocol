@@ -2,7 +2,7 @@
 
 本文是 `kind: decision` 与 `outputSchema: decision-v1` 的规范来源。结果结构另有
 [机器可读 Schema](schemas/decision-v1.schema.json)。实现者还必须遵守
-[公共进程协议](protocol-v1.md)和[公共数据契约](data-contracts-v1.md)。
+[进程协议](protocol-v1.md)和[共享数据约定](data-contracts-v1.md)。
 
 ## 1. 职责边界
 

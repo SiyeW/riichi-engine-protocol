@@ -3,7 +3,7 @@
 本文是 `kind: opponent-analysis` 与 `outputSchema: opponent-analysis-v1` 的规范来源，
 结果结构另有[机器可读 Schema](schemas/opponent-analysis-v1.schema.json)。
 “读牌引擎”是界面名称，协议类型仍使用稳定标识 `opponent-analysis`。实现者还必须遵守
-[公共进程协议](protocol-v1.md)和[公共数据契约](data-contracts-v1.md)。
+[进程协议](protocol-v1.md)和[共享数据约定](data-contracts-v1.md)。
 
 ## 1. 职责边界
 

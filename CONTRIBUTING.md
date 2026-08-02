@@ -1,19 +1,14 @@
 # Contributing
 
-Riichi Engine Protocol is currently a public draft. Compatibility discussions
-are welcome before implementations depend on a field or behavior.
+Issues, suggestions, and pull requests are welcome. For changes to the wire
+format or compatibility rules, please open an issue first to discuss the
+approach.
 
-Before opening a change:
+Before submitting a pull request:
 
-1. Read `architecture.md` and the shared data contract.
-2. Keep host, engine runtime, and model-package responsibilities separate.
-3. Use vendor-neutral examples; do not make a model family part of the protocol.
-4. Update `CHANGELOG.md` when behavior or compatibility changes.
-5. Run `python scripts/check_protocol.py`.
+1. Update the relevant specification and schema together.
+2. Update examples and the changelog when behavior changes.
+3. Run `.\.conda-build\python.exe scripts\check_protocol.py`.
 
-Compatible optional fields raise the protocol minor version. Removing a field,
-narrowing valid input, or changing existing semantics requires a new major
-version. Editorial corrections do not change the wire version.
-
-By contributing, you agree that your contribution is licensed under the
-Apache License 2.0 used by this repository.
+Contributions are licensed under the Apache License 2.0 used by this
+repository.

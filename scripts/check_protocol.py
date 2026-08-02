@@ -5,6 +5,7 @@ from __future__ import annotations
 
 import hashlib
 import json
+import subprocess
 from pathlib import Path
 
 
@@ -21,8 +22,27 @@ def require(condition: bool, message: str) -> None:
         raise ValueError(message)
 
 
+def iter_public_json_files() -> list[Path]:
+    """Return repository JSON files tracked or eligible for tracking."""
+    if (ROOT / ".git").exists():
+        result = subprocess.run(
+            ["git", "ls-files", "--cached", "--others", "--exclude-standard", "-z", "*.json"],
+            cwd=ROOT,
+            check=True,
+            capture_output=True,
+        )
+        return sorted(ROOT / Path(item) for item in result.stdout.decode("utf-8").split("\0") if item)
+
+    excluded_directories = {".build", ".git", ".venv", "build", "dist", "runtime", "__pycache__"}
+    return sorted(
+        path
+        for path in ROOT.rglob("*.json")
+        if not any(part in excluded_directories or part.startswith(".conda") for part in path.relative_to(ROOT).parts)
+    )
+
+
 def main() -> None:
-    json_files = sorted(ROOT.rglob("*.json"))
+    json_files = iter_public_json_files()
     documents = {path: load_json(path) for path in json_files}
 
     project = documents[ROOT / "protocol.json"]

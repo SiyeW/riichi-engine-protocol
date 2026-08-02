@@ -1,4 +1,4 @@
-# 公共进程协议 v1
+# 进程协议 v1
 
 状态：公开草案 1.0
 
@@ -376,7 +376,7 @@ spawn
 `decision` 引擎实现 `decision.analyze`。完整请求、结果、候选动作、评分组及概率约束只在
 [决策引擎规范 v1](decision-engine-v1.md)定义。
 
-公共传输层只要求该方法：
+通用传输层只规定该方法：
 
 - 使用 JSON-RPC 请求 ID 关联一次调用；
 - 遵守初始化得到的 `outputSchema: decision-v1`；
@@ -389,7 +389,7 @@ spawn
 语义、精确零及规则修饰只在
 [读牌引擎规范 v1](opponent-analysis-engine-v1.md)定义。
 
-公共传输层只要求该方法：
+通用传输层只规定该方法：
 
 - 使用 JSON-RPC 请求 ID 关联一次调用；
 - 遵守初始化得到的 `outputSchema: opponent-analysis-v1`；

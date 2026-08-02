@@ -14,7 +14,7 @@
 6. 使用多个 `sessionId` 测试独立的增量状态。
 7. 通过程序提供的协议一致性测试后再分发。
 
-公共协议见 [protocol-v1.md](protocol-v1.md) 和
+通用协议见 [protocol-v1.md](protocol-v1.md) 和
 [data-contracts-v1.md](data-contracts-v1.md)。业务实现分别见
 [decision-engine-v1.md](decision-engine-v1.md) 与
 [opponent-analysis-engine-v1.md](opponent-analysis-engine-v1.md)。
