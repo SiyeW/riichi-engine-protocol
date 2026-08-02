@@ -2,6 +2,10 @@
 
 The protocol uses the following English terms consistently:
 
+Game and rule-system prose uses `Riichi Mahjong`. Geographic qualifiers are
+not used for the game. Language names and locale identifiers remain valid when
+they identify a translation or software-localization boundary.
+
 | Term | Meaning |
 | --- | --- |
 | host | Application that owns game rules, scheduling, configuration, and UI |
