@@ -6,6 +6,8 @@ The format is based on Keep a Changelog and this project uses Semantic Versionin
 
 ## [Unreleased]
 
+- Align public-facing spelling and use the consistent `canceled` response field
+  and `REQUEST_CANCELED` error name.
 - Standardise game and rule-system prose on `Riichi Mahjong`.
 - Add optional engine source and third-party notice metadata, and clarify that
   a license file alone does not replace source-code and attribution duties.
