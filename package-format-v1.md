@@ -56,6 +56,7 @@ profiles.json
   "id": "example.decision-engine",
   "name": "Example Decision Engine",
   "version": "1.0.0",
+  "sourceUrl": "https://github.com/example/example-decision-engine",
   "protocol": {
     "name": "riichi-engine-protocol",
     "major": 1,
@@ -111,6 +112,12 @@ profiles.json
     {
       "name": "GNU Affero General Public License v3.0",
       "path": "LICENSE"
+    }
+  ],
+  "notices": [
+    {
+      "name": "Third-party notices",
+      "path": "THIRD_PARTY_NOTICES.md"
     }
   ]
 }
@@ -252,6 +259,11 @@ v1 建议支持以下 `x-ui` 字段：
 
 ## 7. 分发与许可
 
-引擎包必须附带适用的许可证和必要的 NOTICE。第三方引擎是可执行代码，安装界面必须明确提示其来源和风险。
+公开分发的引擎包必须在 `licenses` 中列出适用的完整许可证文本，在
+`notices` 中列出必要的版权、归属和第三方声明。宿主应向用户显示这些文档的名称，并提供直接打开入口；`sourceUrl` 应指向与该二进制版本对应、可实际取得的源码。
+
+仅附带许可证文件不自动满足全部许可义务。发布者仍须按实际许可证保留版权与修改声明、提供必要的 NOTICE，并在 GPL/AGPL 等许可证要求时随目标代码提供对应源码或有效的源码获取方式。界面入口不能代替发行包内应包含的完整文件。
+
+第三方引擎是可执行代码，安装界面必须明确提示其来源和风险。
 
 进程边界不改变引擎原有许可证义务，也不应被当作规避开源许可证的手段。发布者应分别确认程序、引擎代码和模型权重的再分发条件。
