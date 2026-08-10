@@ -17,7 +17,7 @@ The protocol is under development and may change before its first stable release
 
 ### Specification
 
-[Engine outputs and analysis requests](protocol.md)
+[Protocol specification](protocol.md)
 
 ### License
 
@@ -39,7 +39,7 @@ their respective licenses; see
 
 ### 协议文档
 
-[引擎输出与分析请求](protocol.md)
+[协议规范](protocol.md)
 
 ### 许可证
 
@@ -62,7 +62,7 @@ their respective licenses; see
 
 ### 仕様書
 
-[エンジンの出力と解析リクエスト](protocol.md)
+[プロトコル仕様](protocol.md)
 
 ### ライセンス
 
