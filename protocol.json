@@ -1,9 +1,0 @@
-{
-  "name": "riichi-engine-protocol",
-  "projectVersion": "0.1.0-alpha.1",
-  "wireVersion": {
-    "major": 1,
-    "minor": 0
-  },
-  "status": "draft"
-}
