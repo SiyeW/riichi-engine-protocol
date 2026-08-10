@@ -4,4 +4,3 @@ __pycache__/
 .build/
 build/
 dist/
-examples/mock-decision-engine/runtime/

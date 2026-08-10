@@ -7,8 +7,8 @@ approach.
 Before submitting a pull request:
 
 1. Update the relevant specification and schema together.
-2. Update examples and the changelog when behavior changes.
-3. Run `.\.conda-build\python.exe scripts\check_protocol.py`.
+2. Update the changelog when behavior changes.
+3. Run `python scripts\check_protocol.py`.
 
 Contributions are licensed under the Apache License 2.0 used by this
 repository.

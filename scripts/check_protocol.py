@@ -1,9 +1,8 @@
 #!/usr/bin/env python3
-"""Dependency-free repository consistency checks for the protocol draft."""
+"""Dependency-free repository consistency checks for the protocol."""
 
 from __future__ import annotations
 
-import hashlib
 import json
 import subprocess
 from pathlib import Path
@@ -31,7 +30,8 @@ def iter_public_json_files() -> list[Path]:
             check=True,
             capture_output=True,
         )
-        return sorted(ROOT / Path(item) for item in result.stdout.decode("utf-8").split("\0") if item)
+        paths = (ROOT / Path(item) for item in result.stdout.decode("utf-8").split("\0") if item)
+        return sorted(path for path in paths if path.is_file())
 
     excluded_directories = {".build", ".git", ".venv", "build", "dist", "runtime", "__pycache__"}
     return sorted(
@@ -59,20 +59,7 @@ def main() -> None:
         require(schema_id not in schema_ids, f"duplicate schema $id: {schema_id}")
         schema_ids.add(schema_id)
 
-    example = ROOT / "examples" / "mock-decision-engine"
-    engine = documents[example / "engine.json"]
-    model = documents[example / "model.json"]
-    require(isinstance(engine, dict) and isinstance(model, dict), "example metadata must be objects")
-    require(model.get("engineId") == engine.get("id"), "example model engineId mismatch")
-    require(engine.get("protocol", {}).get("name") == project.get("name"), "example protocol name mismatch")
-
-    model_path = example / str(model.get("file"))
-    require(model_path.is_file(), "example model file is missing")
-    digest = hashlib.sha256(model_path.read_bytes()).hexdigest()
-    require(digest == model.get("sha256"), "example model SHA-256 mismatch")
-    require(model_path.stat().st_size == model.get("sizeBytes"), "example model size mismatch")
-
-    print(f"OK: parsed {len(json_files)} JSON files and checked the mock package")
+    print(f"OK: parsed {len(json_files)} JSON files and checked {len(schema_ids)} schemas")
 
 
 if __name__ == "__main__":
