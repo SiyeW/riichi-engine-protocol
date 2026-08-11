@@ -534,12 +534,14 @@ Markdown 或终端控制字符。
           "id": "q-value",
           "title": {"default": "Q value"},
           "format": "number",
+          "fractionDigits": 3,
           "preferredDirection": "higher"
         },
         {
           "id": "policy",
           "title": {"default": "Policy"},
           "format": "percentage",
+          "fractionDigits": 2,
           "preferredDirection": "higher"
         },
         {
@@ -894,6 +896,7 @@ Markdown 或终端控制字符。
     "default": "Expected final placement after choosing this action."
   },
   "format": "number",
+  "fractionDigits": 2,
   "preferredDirection": "lower"
 }
 ```
@@ -904,10 +907,13 @@ Markdown 或终端控制字符。
 | `title` | 是 | 多语言短标题。 |
 | `description` | 否 | 多语言说明。 |
 | `format` | 是 | `number`、`percentage` 或 `points`，用于宿主格式化数值。 |
+| `fractionDigits` | 否 | `0..12` 的整数，指定显示时保留的小数位数。`percentage` 在换算为百分数后应用该精度。 |
 | `preferredDirection` | 是 | `higher`、`lower` 或 `none`，表示数值的偏好方向。 |
 
 `format` 只规定显示格式，不规定指标的统计意义。指标的意义由稳定 ID、标题和说明共同给出。
 相同引擎主版本内，相同指标 ID 的格式、方向和意义不得改变。
+`fractionDigits` 只影响显示，不改变引擎返回的数值。未提供时，宿主使用常规数值格式，并且不得
+根据指标 ID 猜测小数位数。
 
 初始化结果可以提供 `primaryMetricId`，其值必须是当前 `metrics` 中的一个 ID。宿主可以用
 主要指标绘制推荐条或排序明细。没有主要指标时，宿主只根据 `bestCandidateId` 标示推荐动作。
