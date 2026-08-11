@@ -1,71 +1,79 @@
-[English](#english) | [中文](#中文) | [日本語](#日本語)
+### [中文](#%E4%B8%AD%E6%96%87) | [日本語](#%E6%97%A5%E6%9C%AC%E8%AA%9E) | [English](#english)
 
 ---
 
-## English
-
-### Riichi Engine Protocol
-
-An open protocol for connecting Riichi Mahjong applications with independently
-distributed engines and models.
-
-Engines declare the outputs they provide. A single engine can combine action
-recommendations, opponent predictions, wall predictions, and other compatible
-outputs. Messages use JSON-RPC 2.0 over JSONL.
-
-The protocol is under development and may change before its first stable release.
-
-### Specification
-
-[Protocol specification](protocol.md)
-
-### License
-
-Licensed under the Apache License 2.0. Third-party code and materials retain
-their respective licenses; see
-[`THIRD_PARTY_NOTICES.md`](THIRD_PARTY_NOTICES.md).
-
----
+<div lang="zh-CN">
 
 ## 中文
 
 ### Riichi Engine Protocol
 
-一套连接立直麻将程序与独立发布的引擎和模型的开放协议。
+一套连接立直麻将程序与独立引擎和模型的开放协议。
 
-引擎通过输出契约声明自己能够提供的数据。同一个引擎可以同时提供动作推荐、对手预测、牌山预测或其他兼容输出。协议通过 JSONL 传输 JSON-RPC 2.0 消息。
+引擎声明自己能够提供的输出。同一个引擎可以同时提供动作推荐、对手预测、牌山预测及其他兼容输出，主程序也可以将不同输出分别交给不同的引擎。通信采用通过 JSONL 传输的 JSON-RPC 2.0 消息。
 
-协议目前仍在开发，首个稳定版本发布前可能继续调整。
+### 协议规范
 
-### 协议文档
+[阅读中文协议规范](protocol.zh-CN.md)
 
-[协议规范](protocol.md)
+另有[日文版](protocol.ja-JP.md)和[英文版](protocol.en-US.md)。
 
-### 许可证
+### 相关项目与许可证
 
-采用 Apache License 2.0。第三方代码和素材适用各自的许可条款，详见 [`THIRD_PARTY_NOTICES.md`](THIRD_PARTY_NOTICES.md)。
+- [riichi-mahjong-studio](https://github.com/SiyeW/riichi-mahjong-studio)：一款使用本协议的立直麻将牌谱研究和对局练习桌面程序
+
+本项目采用 [Apache License 2.0](LICENSE)。
+
+</div>
 
 ---
+
+<div lang="ja-JP">
 
 ## 日本語
 
 ### Riichi Engine Protocol
 
-リーチ麻雀アプリケーションと、個別に配布されるエンジンおよびモデルを接続するための
-オープンプロトコルです。
+リーチ麻雀アプリケーションと、独立したエンジンやモデルを接続するためのオープンプロトコルです。
 
-エンジンは出力契約を通じて、提供できるデータを宣言します。1つのエンジンで、行動の
-推奨、対戦相手の予測、牌山の予測など、互換性のある複数の出力を提供できます。
-メッセージは JSONL 形式で JSON-RPC 2.0 を送受信します。
+エンジンは、自身が提供できる出力を宣言します。1 つのエンジンで行動の推奨、対戦相手の予測、牌山の予測など複数の出力を提供できるほか、アプリケーション側で出力ごとに別のエンジンを割り当てることもできます。通信には、JSONL で送受信する JSON-RPC 2.0 メッセージを使用します。
 
-本プロトコルは開発中であり、最初の安定版を公開するまで変更される可能性があります。
+### プロトコル仕様
 
-### 仕様書
+[日本語のプロトコル仕様を読む](protocol.ja-JP.md)
 
-[プロトコル仕様](protocol.md)
+[中国語版](protocol.zh-CN.md)と[英語版](protocol.en-US.md)もあります。
 
-### ライセンス
+### 関連プロジェクトとライセンス
 
-Apache License 2.0 で提供されます。第三者のコードと素材には、それぞれの
-ライセンス条件が適用されます。詳しくは
-[`THIRD_PARTY_NOTICES.md`](THIRD_PARTY_NOTICES.md) を参照してください。
+- [riichi-mahjong-studio](https://github.com/SiyeW/riichi-mahjong-studio)：本プロトコルに対応する、リーチ麻雀の牌譜検討と対局練習のためのデスクトップアプリケーション
+
+本プロジェクトは [Apache License 2.0](LICENSE) で提供されます。
+
+</div>
+
+---
+
+<div lang="en-US">
+
+## English
+
+### Riichi Engine Protocol
+
+An open protocol for connecting Riichi Mahjong applications with independent engines and models.
+
+Each engine declares the outputs it can provide. One engine may combine action recommendations, opponent predictions, wall predictions, and other compatible outputs, while an application may assign different outputs to different engines. Communication uses JSON-RPC 2.0 messages carried over JSONL.
+
+### Protocol specification
+
+[Read the protocol specification in English](protocol.en-US.md)
+
+[Chinese](protocol.zh-CN.md) and [Japanese](protocol.ja-JP.md) versions are also available.
+
+### Related projects and license
+
+- [riichi-mahjong-studio](https://github.com/SiyeW/riichi-mahjong-studio): a desktop application for studying Riichi Mahjong game records and practicing games using this protocol
+
+This project is licensed under the [Apache License 2.0](LICENSE).
+
+</div>
