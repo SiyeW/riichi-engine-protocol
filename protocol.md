@@ -362,7 +362,6 @@ Markdown 或终端控制字符。
   ],
   "runtimeCapabilities": {
     "multipleSessions": true,
-    "incrementalHistory": true,
     "concurrentRequests": false,
     "cancellation": true
   },
@@ -405,12 +404,11 @@ Markdown 或终端控制字符。
 `engine.hello` 返回引擎程序的能力上限。初始化结果必须根据当前权重和有效参数返回实际
 能力，不得增加握手中没有声明的输出、表示、评估指标或明牌支持。
 
-`runtimeCapabilities` 的四个字段都是必需布尔值：
+`runtimeCapabilities` 的三个字段都是必需布尔值：
 
 | 字段 | 意义 |
 | --- | --- |
 | `multipleSessions` | 是否可以在一个初始化实例中隔离多个 `sessionId`。为 `false` 时宿主一次只使用一个会话。 |
-| `incrementalHistory` | 是否会缓存事件共同前缀。无论取值如何，请求仍发送完整 `events`。 |
 | `concurrentRequests` | 是否允许多个分析请求同时执行。为 `false` 时宿主串行发送。 |
 | `cancellation` | 是否处理 `request.cancel` 通知。 |
 
@@ -659,9 +657,10 @@ Markdown 或终端控制字符。
 配置的输出才能合并。引擎必须返回请求中的全部输出且不得增加额外输出；任一输出失败时，
 整个 JSON-RPC 请求返回错误，不返回部分结果。
 
-同一 `sessionId` 的后续请求可以扩展、回退或改写历史。声明 `incrementalHistory` 的引擎可以
-复用不变的共同前缀，但必须以本次完整 `events` 为准，在回退或分支后丢弃不再匹配的状态。
-宿主使用请求 ID 和自己的运行代次判断结果是否仍适用于当前位置，过时结果不得覆盖当前数据。
+同一 `sessionId` 的后续请求可以扩展、回退或改写历史。引擎可以在内部复用不变的共同前缀，
+但必须以本次完整 `events` 为准，在回退或分支后丢弃不再匹配的状态。是否以及如何复用历史
+属于引擎实现，不需要向宿主声明。宿主使用请求 ID 和自己的运行代次判断结果是否仍适用于
+当前位置，过时结果不得覆盖当前数据。
 
 分析结果：
 
