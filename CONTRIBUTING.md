@@ -6,7 +6,7 @@
 
 ## 中文
 
-Issue 和 Pull Request 可以使用中文、日文或英文。
+建议使用中文、日文或英文提交 Issue 和 Pull Request；也欢迎使用其他语言。
 
 ### 输出契约
 
@@ -26,7 +26,7 @@ Issue 和 Pull Request 可以使用中文、日文或英文。
 
 ### 提交前检查
 
-- 同步修改三种语言的规范
+- 同步相应的中文、日文和英文规范；无法完成全部翻译时，请在 Pull Request 中注明
 - 更新 `CHANGELOG.md`
 - 检查 JSON 示例
 - 不提交模型权重、训练数据或构建产物
@@ -39,7 +39,7 @@ Issue 和 Pull Request 可以使用中文、日文或英文。
 
 ## 日本語
 
-Issue と Pull Request は日本語、中国語、英語のいずれでも提出できます。
+Issue と Pull Request では、中国語、日本語、英語の使用を推奨します。その他の言語も歓迎します。
 
 ### 出力契約
 
@@ -59,7 +59,7 @@ Issue と Pull Request は日本語、中国語、英語のいずれでも提出
 
 ### 提出前の確認
 
-- 3言語の仕様を同時に更新する
+- 中国語、日本語、英語の該当箇所を更新する。すべての翻訳が難しい場合は、Pull Request にその旨を記載する
 - `CHANGELOG.md` を更新する
 - JSON サンプルを検証する
 - モデルの重み、学習データ、ビルド成果物を含めない
@@ -72,7 +72,7 @@ Issue と Pull Request は日本語、中国語、英語のいずれでも提出
 
 ## English
 
-Issues and pull requests may be written in English, Chinese, or Japanese.
+Chinese, Japanese, or English is recommended for issues and pull requests. Other languages are equally welcome.
 
 ### Output contracts
 
@@ -92,7 +92,7 @@ Submit protocol and Riichi Mahjong Studio changes to their respective repositori
 
 ### Before submitting
 
-- Update all three language specifications.
+- Update the corresponding Chinese, Japanese, and English specifications. If you cannot provide every translation, note that in the pull request.
 - Update `CHANGELOG.md`.
 - Validate the JSON examples.
 - Do not add model weights, training data, or build output.
