@@ -16,7 +16,7 @@ The protocol identifier is fixed as:
 {
   "name": "riichi-engine-protocol",
   "major": 2,
-  "minor": 0
+  "minor": 1
 }
 ```
 
@@ -55,7 +55,7 @@ The engine package uses `engine.json` as the entry point. The package can be loc
   "protocol": {
     "name": "riichi-engine-protocol",
     "major": 2,
-    "minor": 0
+    "minor": 1
   },
   "entrypoints": {
     "windows-x64": {
@@ -267,6 +267,10 @@ The host must retain every physically distinct candidate, including tsumogiri an
 | `opponent-dora-count` | Provide a dora-count prediction for each opponent. |
 | `opponent-score` | Provides score predictions for each opponent. |
 | `wall-tile-count` | Predict the number of the 34 tile types that have not yet been revealed and are still in the wall. |
+| `kyoku-outcome` | Predict the probability that the current kyoku ends in a draw and each player's win, deal-in, and conditional target probabilities. |
+| `kyoku-score-delta` | Predict each player's score change from the current position through settlement of the current kyoku. |
+| `match-placement` | Predict each player's final placement when the current match ends. |
+| `match-score` | Predict each player's final point-stick score when the current match ends. |
 
 `opponent-dora-count` and `opponent-score` each specify the recommended statistical interpretation. The protocol does not require the engine to adopt this interpretation, nor does it set additional declaration fields for other interpretations. The host parses the results according to the output structure, numerical range, and the representation determined at initialization.
 
@@ -283,7 +287,7 @@ After the host starts the process, it first calls `engine.hello`:
     "protocol": {
       "name": "riichi-engine-protocol",
       "major": 2,
-      "minor": 0
+      "minor": 1
     },
     "host": {
       "id": "example.host",
@@ -302,7 +306,7 @@ Successful result:
   "protocol": {
     "name": "riichi-engine-protocol",
     "major": 2,
-    "minor": 0
+    "minor": 1
   },
   "engine": {
     "id": "example.opponent-engine",
@@ -795,6 +799,101 @@ The recommended statistical interpretation is the score produced by the correspo
 Under this interpretation, a ron score is the amount paid by the discarder for the hand; a tsumo score is the total paid by the other three players for the hand. The discrete distribution uses actual score values, while `expectedValue` may fall between them. The output is not multiplied by the probability that the player eventually wins.
 
 The protocol only requires `players` to follow the “Seats” section, discrete values to be nonnegative integer points, and `expectedValue` to be at least `0`. The engine need not use the recommended statistical interpretation. It may use this output for a score prediction with another meaning, and the host still parses the same data structure.
+
+## `kyoku-outcome`
+
+```json
+{
+  "drawProbability": 0.25,
+  "players": [
+    {
+      "seat": 0,
+      "winProbability": 0.30,
+      "dealInProbability": 0.06,
+      "targetGivenWin": [
+        {"seat": 0, "probability": 0.42},
+        {"seat": 1, "probability": 0.18},
+        {"seat": 2, "probability": 0.21},
+        {"seat": 3, "probability": 0.19}
+      ]
+    }
+  ]
+}
+```
+
+| Field | Required | Format and meaning |
+| --- | --- | --- |
+| `drawProbability` | Yes | `P(the current kyoku ends in a draw)`, including exhaustive and abortive draws. |
+| `players` | Yes | Each absolute seat `0..3`, exactly once. |
+| `players[].seat` | Yes | The player's absolute seat. |
+| `players[].winProbability` | Yes | `P(the player wins the current kyoku)`. |
+| `players[].dealInProbability` | Yes | `P(the player deals in during the current kyoku)`. |
+| `players[].targetGivenWin` | Yes | The conditional distribution `P(target = seat \| the player wins)`; contains each absolute seat `0..3` exactly once. For tsumo, `target` is the winner. |
+
+`1 - drawProbability` is the probability that at least one player wins. In a double or triple ron, more than one `winProbability` may apply.
+
+## `kyoku-score-delta`
+
+```json
+{
+  "players": [
+    {
+      "seat": 0,
+      "prediction": {
+        "expectedValue": 4760
+      }
+    }
+  ]
+}
+```
+
+`players` must contain each absolute seat `0..3` exactly once. `prediction` uses the “Numeric predictions” container and gives the change from the scores after the last input event to the scores after the current kyoku is settled. Score changes already present in the input history are not counted again.
+
+Distribution values must be integer points and may be negative.
+
+## `match-placement`
+
+```json
+{
+  "players": [
+    {
+      "seat": 0,
+      "prediction": {
+        "distribution": [
+          {"value": 1, "probability": 0.36},
+          {"value": 2, "probability": 0.31},
+          {"value": 3, "probability": 0.21},
+          {"value": 4, "probability": 0.12}
+        ],
+        "expectedValue": 2.09
+      }
+    }
+  ]
+}
+```
+
+`players` must contain each absolute seat `0..3` exactly once. `prediction` uses the “Numeric predictions” container and gives the player's placement when the current match ends.
+
+Distribution values must be integers `1..4`; `expectedValue` must be in `[1, 4]`.
+
+## `match-score`
+
+```json
+{
+  "players": [
+    {
+      "seat": 0,
+      "prediction": {
+        "expectedValue": 29750
+      }
+    }
+  ]
+}
+```
+
+`players` must contain each absolute seat `0..3` exactly once. `prediction` uses the “Numeric predictions” container and gives the player's score when the current match ends.
+
+Distribution values must be integer points and may be negative.
 
 ## `action-recommendation`
 

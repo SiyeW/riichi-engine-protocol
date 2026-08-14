@@ -16,7 +16,7 @@
 {
   "name": "riichi-engine-protocol",
   "major": 2,
-  "minor": 0
+  "minor": 1
 }
 ```
 
@@ -55,7 +55,7 @@
   "protocol": {
     "name": "riichi-engine-protocol",
     "major": 2,
-    "minor": 0
+    "minor": 1
   },
   "entrypoints": {
     "windows-x64": {
@@ -267,6 +267,10 @@
 | `opponent-dora-count` | 提供各对手的宝牌数量预测。 |
 | `opponent-score` | 提供各对手的打点预测。 |
 | `wall-tile-count` | 预测尚未公开且仍留在牌山中的34种牌的数量。 |
+| `kyoku-outcome` | 预测当前小局的流局概率，以及四家的和牌、放铳和条件目标概率。 |
+| `kyoku-score-delta` | 预测四家从当前位置到当前小局结算完成时的点数变化。 |
+| `match-placement` | 预测四家在当前对局结束时的顺位。 |
+| `match-score` | 预测四家在当前对局结束时的点棒分数。 |
 
 `opponent-dora-count` 和 `opponent-score` 各自规定推荐的统计解释。协议不要求引擎采用该解释，也不为其他解释设置额外声明字段。宿主按照输出的结构、数值范围和初始化时确定的表示解析结果。
 
@@ -283,7 +287,7 @@
     "protocol": {
       "name": "riichi-engine-protocol",
       "major": 2,
-      "minor": 0
+      "minor": 1
     },
     "host": {
       "id": "example.host",
@@ -302,7 +306,7 @@
   "protocol": {
     "name": "riichi-engine-protocol",
     "major": 2,
-    "minor": 0
+    "minor": 1
   },
   "engine": {
     "id": "example.opponent-engine",
@@ -795,6 +799,101 @@
 按照这一解释，荣和时的打点为放铳者就该手牌支付的点数；自摸时为另外三名玩家就该手牌支付的点数总和。离散分布使用实际点数档位，`expectedValue` 可以位于离散档位之间。输出不乘以最终和牌概率。
 
 协议只要求 `players` 符合“座位”一节，离散值为非负整数点数，`expectedValue` 不得小于 `0`；不要求引擎采用上述统计解释。引擎可以用该输出表示其他打点预测，宿主仍按相同数据结构解析。
+
+## `kyoku-outcome`
+
+```json
+{
+  "drawProbability": 0.25,
+  "players": [
+    {
+      "seat": 0,
+      "winProbability": 0.30,
+      "dealInProbability": 0.06,
+      "targetGivenWin": [
+        {"seat": 0, "probability": 0.42},
+        {"seat": 1, "probability": 0.18},
+        {"seat": 2, "probability": 0.21},
+        {"seat": 3, "probability": 0.19}
+      ]
+    }
+  ]
+}
+```
+
+| 字段 | 必需 | 格式与意义 |
+| --- | --- | --- |
+| `drawProbability` | 是 | `P(当前小局流局)`；包括荒牌流局和中途流局。 |
+| `players` | 是 | 恰好包含绝对座位 `0..3` 各一次，不受 `controlledSeat` 限制。 |
+| `players[].seat` | 是 | 对应玩家的绝对座位。 |
+| `players[].winProbability` | 是 | `P(该玩家在当前小局中和牌)`。 |
+| `players[].dealInProbability` | 是 | `P(该玩家在当前小局中放铳)`。 |
+| `players[].targetGivenWin` | 是 | `P(target = 对应座位 \| 该玩家和牌)` 的条件概率分布；恰好包含绝对座位 `0..3` 各一次。自摸时 `target` 等于和牌玩家。 |
+
+`1 - drawProbability` 是至少一名玩家和牌的概率。双响或三响时，各家的 `winProbability` 可以同时成立。
+
+## `kyoku-score-delta`
+
+```json
+{
+  "players": [
+    {
+      "seat": 0,
+      "prediction": {
+        "expectedValue": 4760
+      }
+    }
+  ]
+}
+```
+
+`players` 必须恰好包含绝对座位 `0..3` 各一次。`prediction` 使用“数值预测”容器，表示从最后一个输入事件后的当前分数，到本局结算后分数的变化。输入历史中已经发生的分数变化不再重复计算。
+
+离散分布的值必须是整数点数，可以为负数。
+
+## `match-placement`
+
+```json
+{
+  "players": [
+    {
+      "seat": 0,
+      "prediction": {
+        "distribution": [
+          {"value": 1, "probability": 0.36},
+          {"value": 2, "probability": 0.31},
+          {"value": 3, "probability": 0.21},
+          {"value": 4, "probability": 0.12}
+        ],
+        "expectedValue": 2.09
+      }
+    }
+  ]
+}
+```
+
+`players` 必须恰好包含绝对座位 `0..3` 各一次。`prediction` 使用“数值预测”容器，表示当前对局结束时的顺位。
+
+离散分布的值必须是整数 `1..4`，`expectedValue` 必须位于 `[1, 4]`。
+
+## `match-score`
+
+```json
+{
+  "players": [
+    {
+      "seat": 0,
+      "prediction": {
+        "expectedValue": 29750
+      }
+    }
+  ]
+}
+```
+
+`players` 必须恰好包含绝对座位 `0..3` 各一次。`prediction` 使用“数值预测”容器，表示当前对局结束时的分数。
+
+离散分布的值必须是整数点数，可以为负数。
 
 ## `action-recommendation`
 

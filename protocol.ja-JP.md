@@ -16,7 +16,7 @@
 {
   "name": "riichi-engine-protocol",
   "major": 2,
-  "minor": 0
+  "minor": 1
 }
 ```
 
@@ -55,7 +55,7 @@
   "protocol": {
     "name": "riichi-engine-protocol",
     "major": 2,
-    "minor": 0
+    "minor": 1
   },
   "entrypoints": {
     "windows-x64": {
@@ -267,6 +267,10 @@
 | `opponent-dora-count` | 各対戦相手のドラ数を予測する。 |
 | `opponent-score` | 各対戦相手の打点予測を提供します。 |
 | `wall-tile-count` | まだ公開されておらず、牌山に残っている34種の牌の枚数を予測する。 |
+| `kyoku-outcome` | 現在の局が流局する確率と、4人それぞれの和了、放銃、および条件付き target 確率を予測する。 |
+| `kyoku-score-delta` | 現在の局面から現在の局の精算完了までの各プレイヤーの持ち点変化を予測する。 |
+| `match-placement` | 現在の対局終了時における各プレイヤーの最終順位を予測する。 |
+| `match-score` | 現在の対局終了時における各プレイヤーの最終持ち点を予測する。 |
 
 `opponent-dora-count` と `opponent-score` はそれぞれ推奨される統計的解釈を規定しています。プロトコルはエンジンにその解釈を採用することを要求せず、他の解釈のために追加の宣言フィールドを設定することもありません。ホストは出力の構造、数値範囲、および初期化時に決定された表現に従って結果を解析します。
 
@@ -283,7 +287,7 @@
     "protocol": {
       "name": "riichi-engine-protocol",
       "major": 2,
-      "minor": 0
+      "minor": 1
     },
     "host": {
       "id": "example.host",
@@ -302,7 +306,7 @@
   "protocol": {
     "name": "riichi-engine-protocol",
     "major": 2,
-    "minor": 0
+    "minor": 1
   },
   "engine": {
     "id": "example.opponent-engine",
@@ -795,6 +799,101 @@
 この解釈では、ロンの打点は放銃者がその手牌に対して支払う点数、ツモの打点は他の3人がその手牌に対して支払う点数の合計です。離散分布には実際の点数区分を使用し、`expectedValue` はその区分の間の値を取ることもできます。最終的な和了確率は掛けません。
 
 プロトコルが要求するのは、`players` が「座席」の節に従うこと、離散値が非負整数の点数であること、`expectedValue` が `0` 以上であることだけです。エンジンが上記の統計的解釈を採用する必要はありません。この出力を別の意味の打点予測に使用しても、ホストは同じデータ構造として解析します。
+
+## `kyoku-outcome`
+
+```json
+{
+  "drawProbability": 0.25,
+  "players": [
+    {
+      "seat": 0,
+      "winProbability": 0.30,
+      "dealInProbability": 0.06,
+      "targetGivenWin": [
+        {"seat": 0, "probability": 0.42},
+        {"seat": 1, "probability": 0.18},
+        {"seat": 2, "probability": 0.21},
+        {"seat": 3, "probability": 0.19}
+      ]
+    }
+  ]
+}
+```
+
+| フィールド | 必須 | 形式と意味 |
+| --- | --- | --- |
+| `drawProbability` | はい | `P(現在の局が流局する)`。荒牌流局と途中流局を含みます。 |
+| `players` | はい | 絶対座席 `0..3` をそれぞれ1回ずつ含む。 |
+| `players[].seat` | はい | プレイヤーの絶対座席。 |
+| `players[].winProbability` | はい | `P(そのプレイヤーが現在の局で和了する)`。 |
+| `players[].dealInProbability` | はい | `P(そのプレイヤーが現在の局で放銃する)`。 |
+| `players[].targetGivenWin` | はい | 条件付き確率分布 `P(target = 座席 \| そのプレイヤーが和了する)`。絶対座席 `0..3` をそれぞれ1回ずつ含みます。ツモでは `target` と和了者が一致します。 |
+
+`1 - drawProbability` は、少なくとも1人が和了する確率です。ダブロンやトリプルロンでは、複数の `winProbability` が同時に成立します。
+
+## `kyoku-score-delta`
+
+```json
+{
+  "players": [
+    {
+      "seat": 0,
+      "prediction": {
+        "expectedValue": 4760
+      }
+    }
+  ]
+}
+```
+
+`players` は絶対座席 `0..3` をそれぞれ1回ずつ含みます。`prediction` は「数値予測」コンテナを使用し、最後の入力イベント後の持ち点から、現在の局の精算後までの持ち点変化を表します。入力履歴に反映済みの変化は重ねて計上しません。
+
+離散分布の値は整数点とし、負の値も使用できます。
+
+## `match-placement`
+
+```json
+{
+  "players": [
+    {
+      "seat": 0,
+      "prediction": {
+        "distribution": [
+          {"value": 1, "probability": 0.36},
+          {"value": 2, "probability": 0.31},
+          {"value": 3, "probability": 0.21},
+          {"value": 4, "probability": 0.12}
+        ],
+        "expectedValue": 2.09
+      }
+    }
+  ]
+}
+```
+
+`players` は絶対座席 `0..3` をそれぞれ1回ずつ含みます。`prediction` は「数値予測」コンテナを使用し、現在の対局が終了したときの順位を表します。
+
+離散分布の値は整数 `1..4`、`expectedValue` は `[1, 4]` とします。
+
+## `match-score`
+
+```json
+{
+  "players": [
+    {
+      "seat": 0,
+      "prediction": {
+        "expectedValue": 29750
+      }
+    }
+  ]
+}
+```
+
+`players` は絶対座席 `0..3` をそれぞれ1回ずつ含みます。`prediction` は「数値予測」コンテナを使用し、現在の対局が終了したときの持ち点を表します。
+
+離散分布の値は整数点とし、負の値も使用できます。
 
 ## `action-recommendation`
 
