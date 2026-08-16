@@ -182,11 +182,11 @@ A numeric prediction supports three representations:
 | `expected-value` | `expectedValue` | The mathematical expectation of the predicted value. Must be a finite JSON number. |
 | `point-estimate` | `pointEstimate` | A scalar prediction supplied directly by the engine. Must be a finite JSON number. |
 
-In numerical prediction, `distribution`'s `value` must be a finite JSON number. String values are only for use by other output contracts that adopt a discrete distribution and cannot be used to compute `expectedValue`.
+In a numeric prediction, each `distribution` value must be a finite JSON number unless the output contract explicitly defines a string range. A distribution containing a string range cannot be combined with `expected-value` or used to derive a scalar value.
 
 The current engine configuration determines which representations are used for each output during initialization. Declared fields must appear in every corresponding result afterward, and undeclared fields must not appear. If both `distribution` and `expected-value` are declared, `expectedValue` must equal the weighted average of `distribution` within an absolute or relative tolerance of `1e-4`. `pointEstimate` is independent and need not equal `expectedValue` or the weighted average of `distribution`.
 
-A host may choose how to use the available representations. When only `distribution` is provided, it may use the weighted average as a scalar value. When `point-estimate` is also provided, it may prefer `pointEstimate`.
+A host may choose how to use the available representations. When a numeric-only `distribution` is provided, it may use the weighted average as a scalar value. When `point-estimate` is also provided, it may prefer `pointEstimate`.
 
 Count distributions must use nonnegative integers; score distributions must use nonnegative integer points. Their `expectedValue` and `pointEstimate` must not be less than `0` and need not be one of the discrete values that can actually occur.
 
@@ -764,9 +764,9 @@ The output indicates the number of each tile type that remains in the wall and h
           {"value": 1, "probability": 0.40},
           {"value": 2, "probability": 0.25},
           {"value": 3, "probability": 0.10},
-          {"value": 4, "probability": 0.05}
+          {"value": "4+", "probability": 0.05}
         ],
-        "expectedValue": 1.4
+        "pointEstimate": 1.4
       }
     }
   ]
@@ -777,7 +777,7 @@ The recommended statistical interpretation is the total number of dora counted w
 
 Under this interpretation, the output is not the number of dora currently known to be in the player's hand, and it is not multiplied by the probability that the player eventually wins.
 
-The protocol only requires `players` to follow the “Seats” section, discrete values to be nonnegative integers, and `expectedValue` and `pointEstimate` to be at least `0`. The engine need not use the recommended statistical interpretation. It may use this output for a dora-count prediction with another meaning, and the host still parses the same data structure.
+The protocol only requires `players` to follow the “Seats” section, discrete values to be nonnegative integers or strings in the form `N+`, and `expectedValue` and `pointEstimate` to be at least `0`. The engine need not use the recommended statistical interpretation. `N` is a nonnegative decimal integer without unnecessary leading zeroes, and `N+` means at least `N`. A distribution may contain at most one `N+` value and must not also contain numeric values greater than or equal to `N`. The engine may use this output for a dora-count prediction with another meaning, and the host still parses the same data structure.
 
 ## `opponent-score`
 

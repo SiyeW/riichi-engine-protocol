@@ -182,11 +182,11 @@
 | `expected-value` | `expectedValue` | 预测值的数学期望，必须是有限 JSON 数值。 |
 | `point-estimate` | `pointEstimate` | 引擎直接给出的标量预测，必须是有限 JSON 数值。 |
 
-数值预测中，`distribution` 的 `value` 必须是有限 JSON 数值。字符串取值只供其他采用离散分布的输出契约使用，不能用于计算 `expectedValue`。
+数值预测中，`distribution` 的 `value` 必须是有限 JSON 数值，除非具体输出契约另行规定字符串区间。包含字符串区间的分布不能与 `expected-value` 同时使用，也不能用于派生标量。
 
 当前引擎配置在初始化时确定每项输出使用哪些表示。声明的字段必须出现在之后的每个对应结果中，未声明的字段不得出现。若同时声明 `distribution` 和 `expected-value`，`expectedValue` 必须在 `1e-4` 的绝对或相对容差内等于 `distribution` 的加权平均。`pointEstimate` 是独立表示，不要求等于 `expectedValue` 或分布的加权平均。
 
-宿主可以自行决定如何使用可用表示。只提供 `distribution` 时，可以用其加权平均得到标量；同时提供 `point-estimate` 时，可以优先使用 `pointEstimate`。
+宿主可以自行决定如何使用可用表示。只提供数值 `distribution` 时，可以用其加权平均得到标量；同时提供 `point-estimate` 时，可以优先使用 `pointEstimate`。
 
 数量分布的值必须是非负整数；打点分布的值必须是非负整数点数。数量和打点的 `expectedValue`、`pointEstimate` 不得小于 `0`，也不要求是实际可能出现的离散值。
 
@@ -764,9 +764,9 @@
           {"value": 1, "probability": 0.40},
           {"value": 2, "probability": 0.25},
           {"value": 3, "probability": 0.10},
-          {"value": 4, "probability": 0.05}
+          {"value": "4+", "probability": 0.05}
         ],
-        "expectedValue": 1.4
+        "pointEstimate": 1.4
       }
     }
   ]
@@ -777,7 +777,7 @@
 
 按照这一解释，输出不表示玩家当前已经确定持有的宝牌数量，也不乘以最终和牌概率。
 
-协议只要求 `players` 符合“座位”一节，离散值为非负整数，`expectedValue` 和 `pointEstimate` 不得小于 `0`；不要求引擎采用上述统计解释。引擎可以用该输出表示其他宝牌数量预测，宿主仍按相同数据结构解析。
+协议只要求 `players` 符合“座位”一节，离散值为非负整数或形如 `N+` 的字符串，`expectedValue` 和 `pointEstimate` 不得小于 `0`；不要求引擎采用上述统计解释。`N` 使用不含多余前导零的十进制非负整数，`N+` 表示数量不小于 `N`。同一分布最多使用一个 `N+`，并且不得再列出不小于 `N` 的数值。引擎可以用该输出表示其他宝牌数量预测，宿主仍按相同数据结构解析。
 
 ## `opponent-score`
 
