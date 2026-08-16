@@ -16,11 +16,13 @@
 {
   "name": "riichi-engine-protocol",
   "major": 2,
-  "minor": 1
+  "minor": 2
 }
 ```
 
 `major` 不同的双方不得继续通信。宿主在 `engine.hello` 请求中给出自己支持的最高 `minor`；引擎返回双方共同支持的最高 `minor`，不得高于宿主请求值。提高 `minor` 只能增加可忽略的字段、方法或能力，不得改变现有字段和方法的意义。
+
+`engine.hello` 的结果及之后的消息必须符合协商后的 `minor`；引擎不得使用更高 `minor` 才新增的字段、取值、方法或能力。
 
 输出契约具有独立版本。协议版本相同不表示双方支持相同输出；宿主只使用自己认识并且引擎已经声明的输出。引擎声明额外输出不得导致宿主拒绝整个引擎。
 
@@ -55,7 +57,7 @@
   "protocol": {
     "name": "riichi-engine-protocol",
     "major": 2,
-    "minor": 1
+    "minor": 2
   },
   "entrypoints": {
     "windows-x64": {
@@ -157,7 +159,7 @@
 
 ### 数值预测
 
-牌张数量、宝牌数量和打点使用同一种数值预测容器：
+数值预测使用以下结构：
 
 ```json
 {
@@ -167,22 +169,26 @@
     {"value": 3900, "probability": 0.45},
     {"value": 8000, "probability": 0.20}
   ],
-  "expectedValue": 3955
+  "expectedValue": 3955,
+  "pointEstimate": 3900
 }
 ```
 
-数值预测允许两种表示：
+数值预测允许三种表示：
 
 | 表示 | 对应字段 | 格式与意义 |
 | --- | --- | --- |
 | `distribution` | `distribution` | 离散概率分布。 |
 | `expected-value` | `expectedValue` | 预测值的数学期望，必须是有限 JSON 数值。 |
+| `point-estimate` | `pointEstimate` | 引擎直接给出的标量预测，必须是有限 JSON 数值。 |
 
 数值预测中，`distribution` 的 `value` 必须是有限 JSON 数值。字符串取值只供其他采用离散分布的输出契约使用，不能用于计算 `expectedValue`。
 
-当前引擎配置在初始化时确定每项输出使用哪些表示。声明的字段必须出现在之后的每个对应结果中，未声明的字段不得出现。若同时声明两种表示，`expectedValue` 必须在 `1e-4` 的绝对或相对容差内等于 `distribution` 的加权平均。
+当前引擎配置在初始化时确定每项输出使用哪些表示。声明的字段必须出现在之后的每个对应结果中，未声明的字段不得出现。若同时声明 `distribution` 和 `expected-value`，`expectedValue` 必须在 `1e-4` 的绝对或相对容差内等于 `distribution` 的加权平均。`pointEstimate` 是独立表示，不要求等于 `expectedValue` 或分布的加权平均。
 
-数量分布的值必须是非负整数；打点分布的值必须是非负整数点数。数量和打点的 `expectedValue` 不得小于 `0`，也不要求是实际可能出现的离散值。
+宿主可以自行决定如何使用可用表示。只提供 `distribution` 时，可以用其加权平均得到标量；同时提供 `point-estimate` 时，可以优先使用 `pointEstimate`。
+
+数量分布的值必须是非负整数；打点分布的值必须是非负整数点数。数量和打点的 `expectedValue`、`pointEstimate` 不得小于 `0`，也不要求是实际可能出现的离散值。
 
 ### 牌
 
@@ -287,7 +293,7 @@
     "protocol": {
       "name": "riichi-engine-protocol",
       "major": 2,
-      "minor": 1
+      "minor": 2
     },
     "host": {
       "id": "example.host",
@@ -306,7 +312,7 @@
   "protocol": {
     "name": "riichi-engine-protocol",
     "major": 2,
-    "minor": 1
+    "minor": 2
   },
   "engine": {
     "id": "example.opponent-engine",
@@ -364,7 +370,7 @@
 | --- | --- | --- |
 | `id` | 是 | 输出契约 ID。 |
 | `version` | 是 | 输出契约主版本。 |
-| `representations` | 条件必需 | 数值预测可以使用的表示，允许值为 `distribution`、`expected-value`。 |
+| `representations` | 条件必需 | 数值预测可以使用的表示，允许值为 `distribution`、`expected-value`、`point-estimate`。 |
 | `supportsRevealedHands` | 否 | 是否接受明牌输入，默认 `false`。 |
 | `metrics` | 条件必需 | `action-recommendation` 可以提供的评估指标；没有指标时使用空数组。 |
 
@@ -520,7 +526,7 @@
     {
       "id": "opponent-dora-count",
       "version": 1,
-      "representations": ["distribution", "expected-value"],
+      "representations": ["distribution", "point-estimate"],
       "supportsRevealedHands": true
     }
   ],
@@ -720,7 +726,7 @@
 }
 ```
 
-`players` 使用“座位”一节定义的其他座位。每个 `tiles` 必须恰好包含34种牌。离散分布存在时，取值必须是整数 `0..4`；未列出的取值概率为 `0`。宿主可以从分布派生“至少持有一张”的概率 `1 - P(0)`。
+`players` 使用“座位”一节定义的其他座位。每个 `tiles` 必须恰好包含34种牌。离散分布存在时，取值必须是整数 `0..4`；未列出的取值概率为 `0`。`expectedValue` 或 `pointEstimate` 存在时，必须位于 `[0, 4]`。宿主可以从分布派生“至少持有一张”的概率 `1 - P(0)`。
 
 ## `wall-tile-count`
 
@@ -743,7 +749,7 @@
 
 输出表示当前事件完成后，尚未公开且仍留在牌山中的各种牌的数量。它只表示整个未公开牌山 `all-unrevealed-wall`，不区分活牌区域和王牌区域，也不提供区域字段。
 
-`tiles` 必须恰好包含34种牌。离散分布存在时，取值必须是整数 `0..4`；未列出的取值概率为 `0`。
+`tiles` 必须恰好包含34种牌。离散分布存在时，取值必须是整数 `0..4`；未列出的取值概率为 `0`。`expectedValue` 或 `pointEstimate` 存在时，必须位于 `[0, 4]`。
 
 ## `opponent-dora-count`
 
@@ -771,7 +777,7 @@
 
 按照这一解释，输出不表示玩家当前已经确定持有的宝牌数量，也不乘以最终和牌概率。
 
-协议只要求 `players` 符合“座位”一节，离散值为非负整数，`expectedValue` 不得小于 `0`；不要求引擎采用上述统计解释。引擎可以用该输出表示其他宝牌数量预测，宿主仍按相同数据结构解析。
+协议只要求 `players` 符合“座位”一节，离散值为非负整数，`expectedValue` 和 `pointEstimate` 不得小于 `0`；不要求引擎采用上述统计解释。引擎可以用该输出表示其他宝牌数量预测，宿主仍按相同数据结构解析。
 
 ## `opponent-score`
 
@@ -796,9 +802,9 @@
 
 推荐的统计解释是：条件于对应玩家最终在当前牌局中和牌，预测其和牌结算时由该手牌产生的打点，不区分荣和与自摸。数值不包括本场加分、立直棒、供托或其他场供。
 
-按照这一解释，荣和时的打点为放铳者就该手牌支付的点数；自摸时为另外三名玩家就该手牌支付的点数总和。离散分布使用实际点数档位，`expectedValue` 可以位于离散档位之间。输出不乘以最终和牌概率。
+按照这一解释，荣和时的打点为放铳者就该手牌支付的点数；自摸时为另外三名玩家就该手牌支付的点数总和。离散分布使用实际点数档位；`expectedValue` 和 `pointEstimate` 可以位于离散档位之间。输出不乘以最终和牌概率。
 
-协议只要求 `players` 符合“座位”一节，离散值为非负整数点数，`expectedValue` 不得小于 `0`；不要求引擎采用上述统计解释。引擎可以用该输出表示其他打点预测，宿主仍按相同数据结构解析。
+协议只要求 `players` 符合“座位”一节，离散值为非负整数点数，`expectedValue` 和 `pointEstimate` 不得小于 `0`；不要求引擎采用上述统计解释。引擎可以用该输出表示其他打点预测，宿主仍按相同数据结构解析。
 
 ## `kyoku-outcome`
 
@@ -874,7 +880,7 @@
 
 `players` 必须恰好包含绝对座位 `0..3` 各一次。`prediction` 使用“数值预测”容器，表示当前对局结束时的顺位。
 
-离散分布的值必须是整数 `1..4`，`expectedValue` 必须位于 `[1, 4]`。
+离散分布的值必须是整数 `1..4`，`expectedValue` 和 `pointEstimate` 必须位于 `[1, 4]`。
 
 ## `match-score`
 

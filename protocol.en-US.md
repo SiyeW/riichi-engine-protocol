@@ -16,11 +16,13 @@ The protocol identifier is fixed as:
 {
   "name": "riichi-engine-protocol",
   "major": 2,
-  "minor": 1
+  "minor": 2
 }
 ```
 
-Parties with different `major` must not continue communication. In the `engine.hello` request, the host provides the highest `minor` it supports; the engine returns the highest `minor` that both sides support, which must not exceed the value requested by the host. Increasing `minor` can only add negligible fields, methods, or capabilities and must not change the meaning of existing fields and methods.
+Parties with different `major` must not continue communication. In the `engine.hello` request, the host provides the highest `minor` it supports; the engine returns the highest `minor` that both sides support, which must not exceed the value requested by the host. Increasing `minor` may only add ignorable fields, methods, or capabilities and must not change the meaning of existing fields and methods.
+
+The `engine.hello` result and all subsequent messages must conform to the negotiated `minor`. The engine must not use fields, values, methods, or capabilities introduced by a higher `minor`.
 
 Output contracts have independent versions. Having the same protocol version does not mean that both parties support the same outputs; the host only uses outputs it recognizes and that the engine has declared. The engine declaring additional outputs must not cause the host to reject the entire engine.
 
@@ -55,7 +57,7 @@ The engine package uses `engine.json` as the entry point. The package can be loc
   "protocol": {
     "name": "riichi-engine-protocol",
     "major": 2,
-    "minor": 1
+    "minor": 2
   },
   "entrypoints": {
     "windows-x64": {
@@ -157,7 +159,7 @@ Discrete distributions use the following structure:
 
 ### Numeric predictions
 
-Tile counts, dora counts, and scores use the same numeric prediction container:
+Numeric predictions use the following structure:
 
 ```json
 {
@@ -167,22 +169,26 @@ Tile counts, dora counts, and scores use the same numeric prediction container:
     {"value": 3900, "probability": 0.45},
     {"value": 8000, "probability": 0.20}
   ],
-  "expectedValue": 3955
+  "expectedValue": 3955,
+  "pointEstimate": 3900
 }
 ```
 
-A numeric prediction supports two representations:
+A numeric prediction supports three representations:
 
 | Symbol | Corresponding Field | Format and Meaning |
 | --- | --- | --- |
 | `distribution` | `distribution` | Discrete probability distribution. |
-| `expected-value` | `expectedValue` | The mathematical expectation of the predicted value must be a finite JSON number. |
+| `expected-value` | `expectedValue` | The mathematical expectation of the predicted value. Must be a finite JSON number. |
+| `point-estimate` | `pointEstimate` | A scalar prediction supplied directly by the engine. Must be a finite JSON number. |
 
 In numerical prediction, `distribution`'s `value` must be a finite JSON number. String values are only for use by other output contracts that adopt a discrete distribution and cannot be used to compute `expectedValue`.
 
-The current engine configuration determines which representations are used for each output during initialization. Declared fields must appear in every corresponding result afterward, and undeclared fields must not appear. If both representations are declared, `expectedValue` must equal the weighted average of `distribution` within the absolute or relative tolerance of `1e-4`.
+The current engine configuration determines which representations are used for each output during initialization. Declared fields must appear in every corresponding result afterward, and undeclared fields must not appear. If both `distribution` and `expected-value` are declared, `expectedValue` must equal the weighted average of `distribution` within an absolute or relative tolerance of `1e-4`. `pointEstimate` is independent and need not equal `expectedValue` or the weighted average of `distribution`.
 
-Count distributions must use nonnegative integers; score distributions must use nonnegative integer points. Their `expectedValue` must not be less than `0` and need not be one of the discrete values that can actually occur.
+A host may choose how to use the available representations. When only `distribution` is provided, it may use the weighted average as a scalar value. When `point-estimate` is also provided, it may prefer `pointEstimate`.
+
+Count distributions must use nonnegative integers; score distributions must use nonnegative integer points. Their `expectedValue` and `pointEstimate` must not be less than `0` and need not be one of the discrete values that can actually occur.
 
 ### Tiles
 
@@ -287,7 +293,7 @@ After the host starts the process, it first calls `engine.hello`:
     "protocol": {
       "name": "riichi-engine-protocol",
       "major": 2,
-      "minor": 1
+      "minor": 2
     },
     "host": {
       "id": "example.host",
@@ -306,7 +312,7 @@ Successful result:
   "protocol": {
     "name": "riichi-engine-protocol",
     "major": 2,
-    "minor": 1
+    "minor": 2
   },
   "engine": {
     "id": "example.opponent-engine",
@@ -364,7 +370,7 @@ Each output declaration includes:
 | --- | --- | --- |
 | `id` | Yes | the output contract ID. |
 | `version` | Yes | the main version of the output contract. |
-| `representations` | Conditionally required | Representation that can be used for numerical prediction, allowed values are `distribution`, `expected-value`. |
+| `representations` | Conditionally required | Representations available for numeric predictions. Allowed values are `distribution`, `expected-value`, and `point-estimate`. |
 | `supportsRevealedHands` | No | Whether to accept revealed-hand input, default is `false`. |
 | `metrics` | Conditionally required | `action-recommendation` Evaluation indicators that can be provided; use an empty array if there are no indicators. |
 
@@ -520,7 +526,7 @@ The file summary is calculated by the host when it needs to identify the source 
     {
       "id": "opponent-dora-count",
       "version": 1,
-      "representations": ["distribution", "expected-value"],
+      "representations": ["distribution", "point-estimate"],
       "supportsRevealedHands": true
     }
   ],
@@ -720,7 +726,7 @@ Furiten or no yaku = P(shanten 0) × furitenOrNoYaku
 }
 ```
 
-`players` uses other seats defined in the “seat” section. Each `tiles` must contain exactly 34 types of tiles. When a discrete distribution exists, the values must be integers `0..4`; the probability of unlisted values is `0`. The host can derive the probability of “holding at least one” from the distribution `1 - P(0)`.
+`players` uses the other seats defined in the “Seats” section. Each `tiles` object must contain exactly 34 tile types. When a discrete distribution is present, its values must be integers `0..4`; unlisted values have probability `0`. When `expectedValue` or `pointEstimate` is present, it must be in `[0, 4]`. The host may derive the probability of holding at least one tile as `1 - P(0)`.
 
 ## `wall-tile-count`
 
@@ -743,7 +749,7 @@ Furiten or no yaku = P(shanten 0) × furitenOrNoYaku
 
 The output indicates the number of each tile type that remains in the wall and have not been revealed after the current event is completed. It only represents the entire unrevealed wall `all-unrevealed-wall`, without distinguishing between the live wall and dead wall, and does not provide a region field.
 
-`tiles` must contain exactly the 34 tile types. When a discrete distribution exists, the values must be integers `0..4`; the probabilities of unlisted values are `0`.
+`tiles` must contain exactly the 34 tile types. When a discrete distribution is present, its values must be integers `0..4`; unlisted values have probability `0`. When `expectedValue` or `pointEstimate` is present, it must be in `[0, 4]`.
 
 ## `opponent-dora-count`
 
@@ -771,7 +777,7 @@ The recommended statistical interpretation is the total number of dora counted w
 
 Under this interpretation, the output is not the number of dora currently known to be in the player's hand, and it is not multiplied by the probability that the player eventually wins.
 
-The protocol only requires `players` to follow the “Seats” section, discrete values to be nonnegative integers, and `expectedValue` to be at least `0`. The engine need not use the recommended statistical interpretation. It may use this output for a dora-count prediction with another meaning, and the host still parses the same data structure.
+The protocol only requires `players` to follow the “Seats” section, discrete values to be nonnegative integers, and `expectedValue` and `pointEstimate` to be at least `0`. The engine need not use the recommended statistical interpretation. It may use this output for a dora-count prediction with another meaning, and the host still parses the same data structure.
 
 ## `opponent-score`
 
@@ -796,9 +802,9 @@ The protocol only requires `players` to follow the “Seats” section, discrete
 
 The recommended statistical interpretation is the score produced by the corresponding player's hand at settlement, conditional on that player eventually winning the current hand. Ron and tsumo are not distinguished. The value excludes honba payments, riichi sticks, deposits, and other table awards.
 
-Under this interpretation, a ron score is the amount paid by the discarder for the hand; a tsumo score is the total paid by the other three players for the hand. The discrete distribution uses actual score values, while `expectedValue` may fall between them. The output is not multiplied by the probability that the player eventually wins.
+Under this interpretation, a ron score is the amount paid by the discarder for the hand; a tsumo score is the total paid by the other three players for the hand. The discrete distribution uses actual score values, while `expectedValue` and `pointEstimate` may fall between them. The output is not multiplied by the probability that the player eventually wins.
 
-The protocol only requires `players` to follow the “Seats” section, discrete values to be nonnegative integer points, and `expectedValue` to be at least `0`. The engine need not use the recommended statistical interpretation. It may use this output for a score prediction with another meaning, and the host still parses the same data structure.
+The protocol only requires `players` to follow the “Seats” section, discrete values to be nonnegative integer points, and `expectedValue` and `pointEstimate` to be at least `0`. The engine need not use the recommended statistical interpretation. It may use this output for a score prediction with another meaning, and the host still parses the same data structure.
 
 ## `kyoku-outcome`
 
@@ -874,7 +880,7 @@ Distribution values must be integer points and may be negative.
 
 `players` must contain each absolute seat `0..3` exactly once. `prediction` uses the “Numeric predictions” container and gives the player's placement when the current match ends.
 
-Distribution values must be integers `1..4`; `expectedValue` must be in `[1, 4]`.
+Distribution values must be integers `1..4`; `expectedValue` and `pointEstimate` must be in `[1, 4]`.
 
 ## `match-score`
 

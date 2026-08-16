@@ -2,6 +2,36 @@
 
 ## [Unreleased]
 
+<div lang="zh-CN">
+
+### 中文
+
+- 数值预测新增 `point-estimate` 表示，可以同时提供离散分布和独立的标量预测。
+- 补充暗牌数量、牌山剩余数量等标量预测的取值范围。
+- 协商到较低 `minor` 时，引擎不会使用更高版本新增的协议内容。
+
+</div>
+
+<div lang="ja-JP">
+
+### 日本語
+
+- 数値予測に `point-estimate` を追加し、離散分布と独立したスカラー予測値を同時に出力できるようにしました。
+- 手牌枚数や牌山の残り枚数など、スカラー予測値の範囲を明記しました。
+- 低い `minor` で合意した場合、エンジンはそれより新しいバージョンで追加されたプロトコル要素を使用しません。
+
+</div>
+
+<div lang="en-US">
+
+### English
+
+- Add `point-estimate` to numeric predictions so an engine can provide a discrete distribution and an independent scalar prediction together.
+- Specify scalar ranges for concealed-hand tile counts, remaining wall tile counts, and related outputs.
+- Prevent engines from using protocol additions from a higher `minor` after negotiating a lower version.
+
+</div>
+
 ## [2.1.0] - 2026-08-15
 
 <div lang="zh-CN">
