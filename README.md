@@ -19,9 +19,11 @@
 
 [阅读中文协议规范](protocol.zh-CN.md)
 
-### 相关项目与许可证
+### 相关项目
 
 - [riichi-mahjong-studio](https://github.com/SiyeW/riichi-mahjong-studio)：一款使用本协议的立直麻将牌谱研究和对局练习桌面程序
+
+### 许可证
 
 本项目采用 [Apache License 2.0](LICENSE)。
 
@@ -43,9 +45,11 @@
 
 [日本語のプロトコル仕様を読む](protocol.ja-JP.md)
 
-### 関連プロジェクトとライセンス
+### 関連プロジェクト
 
 - [riichi-mahjong-studio](https://github.com/SiyeW/riichi-mahjong-studio)：本プロトコルに対応する、リーチ麻雀の牌譜検討と対局練習のためのデスクトップアプリケーション
+
+### ライセンス
 
 本プロジェクトは [Apache License 2.0](LICENSE) で提供されます。
 
@@ -67,9 +71,11 @@ Each engine declares the outputs it can provide. One engine may combine action r
 
 [Read the protocol specification in English](protocol.en-US.md)
 
-### Related projects and license
+### Related projects
 
 - [riichi-mahjong-studio](https://github.com/SiyeW/riichi-mahjong-studio): a desktop application for studying Riichi Mahjong game records and practicing games using this protocol
+
+### License
 
 This project is licensed under the [Apache License 2.0](LICENSE).
 
