@@ -200,13 +200,13 @@ Physical tiles use the following strings:
 
 `5mr`, `5pr`, `5sr` represent red fives. `?` represents a concealed tile that is not visible in the current input mode and can only appear in game events, and cannot appear in candidate actions or output results.
 
-The prediction output by tile type uses 34 types of tiles, without distinguishing red fives. The key name is:
+The `tiles` object uses 34 tile types and does not distinguish red fives. Its keys are:
 
 ```text
 1m..9m, 1p..9p, 1s..9s, E, S, W, N, P, F, C
 ```
 
-A complete result must contain exactly these 34 keys. Physical tiles in action data may retain red-five markers.
+A complete `tiles` object must contain exactly these 34 keys. `5m`, `5p`, and `5s` each include both regular and red fives of that suit. Count outputs may also provide `redTiles` with the keys `5mr`, `5pr`, and `5sr`; each red-five count is already included in the corresponding five under `tiles`. Physical tiles in action data may retain red-five markers.
 
 ### Seats
 
@@ -269,10 +269,10 @@ The host must retain every physically distinct candidate, including tsumogiri an
 | `action-recommendation` | Recommend a candidate from the legal action candidates provided by the host, and can provide evaluation metrics for each candidate. |
 | `opponent-shanten` | Predict each opponent's shanten distribution and, conditional on tenpai, the probability of furiten or no yaku. |
 | `opponent-deal-in-probability` | Predict the deal-in probability when controlled seats play the 34 tile types to each opponent. |
-| `opponent-concealed-tile-count` | Predict the number of the 34 tile types in each opponent's concealed tiles. |
+| `opponent-concealed-tile-count` | Predict the 34 tile-type counts in each opponent's concealed tiles, with optional separate red-five counts. |
 | `opponent-dora-count` | Provide a dora-count prediction for each opponent. |
 | `opponent-score` | Provides score predictions for each opponent. |
-| `wall-tile-count` | Predict the number of the 34 tile types that have not yet been revealed and are still in the wall. |
+| `wall-tile-count` | Predict the 34 tile-type counts that remain unrevealed in the wall, with optional separate red-five counts. |
 | `kyoku-outcome` | Predict the probability that the current kyoku ends in a draw and each player's win, deal-in, and conditional target probabilities. |
 | `kyoku-score-delta` | Predict each player's score change from the current position through settlement of the current kyoku. |
 | `match-placement` | Predict each player's final placement when the current match ends. |
@@ -720,6 +720,15 @@ Furiten or no yaku = P(shanten 0) × furitenOrNoYaku
           ],
           "expectedValue": 0.56
         }
+      },
+      "redTiles": {
+        "5mr": {
+          "distribution": [
+            {"value": 0, "probability": 0.7},
+            {"value": 1, "probability": 0.3}
+          ],
+          "expectedValue": 0.3
+        }
       }
     }
   ]
@@ -727,6 +736,8 @@ Furiten or no yaku = P(shanten 0) × furitenOrNoYaku
 ```
 
 `players` uses the other seats defined in the “Seats” section. Each `tiles` object must contain exactly 34 tile types. When a discrete distribution is present, its values must be integers `0..4`; unlisted values have probability `0`. When `expectedValue` or `pointEstimate` is present, it must be in `[0, 4]`. The host may derive the probability of holding at least one tile as `1 - P(0)`.
+
+`redTiles` may be omitted. When present, it must contain exactly `5mr`, `5pr`, and `5sr`. Distribution values must be integers from `0` through `1`, and an `expectedValue` or `pointEstimate` must be within `[0, 1]`.
 
 ## `wall-tile-count`
 
@@ -743,6 +754,15 @@ Furiten or no yaku = P(shanten 0) × furitenOrNoYaku
       ],
       "expectedValue": 1.63
     }
+  },
+  "redTiles": {
+    "5mr": {
+      "distribution": [
+        {"value": 0, "probability": 0.4},
+        {"value": 1, "probability": 0.6}
+      ],
+      "expectedValue": 0.6
+    }
   }
 }
 ```
@@ -750,6 +770,8 @@ Furiten or no yaku = P(shanten 0) × furitenOrNoYaku
 The output indicates the number of each tile type that remains in the wall and have not been revealed after the current event is completed. It only represents the entire unrevealed wall `all-unrevealed-wall`, without distinguishing between the live wall and dead wall, and does not provide a region field.
 
 `tiles` must contain exactly the 34 tile types. When a discrete distribution is present, its values must be integers `0..4`; unlisted values have probability `0`. When `expectedValue` or `pointEstimate` is present, it must be in `[0, 4]`.
+
+`redTiles` may be omitted. When present, it must contain exactly `5mr`, `5pr`, and `5sr`. Distribution values must be integers from `0` through `1`, and an `expectedValue` or `pointEstimate` must be within `[0, 1]`.
 
 ## `opponent-dora-count`
 

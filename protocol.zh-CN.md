@@ -200,13 +200,13 @@
 
 `5mr`、`5pr`、`5sr` 表示赤五。`?` 表示在当前输入模式中不可见的暗牌，只能出现在牌局事件中，不能出现在候选动作或输出结果中。
 
-按牌种输出的预测使用34种牌，不区分赤五。键名为：
+按牌种输出的 `tiles` 使用34种牌，不区分赤五。键名为：
 
 ```text
 1m..9m, 1p..9p, 1s..9s, E, S, W, N, P, F, C
 ```
 
-完整结果必须恰好包含这34个键。动作数据中的实体牌仍可保留赤五标记。
+完整的 `tiles` 必须恰好包含这34个键，其中 `5m`、`5p`、`5s` 分别包含同花色的普通五和赤五。枚数输出还可以提供 `redTiles`，其键为 `5mr`、`5pr`、`5sr`；赤五的数量已经包含在 `tiles` 中对应的五里。动作数据中的实体牌仍可保留赤五标记。
 
 ### 座位
 
@@ -269,10 +269,10 @@
 | `action-recommendation` | 从宿主提供的合法动作候选中推荐一个候选，并可提供各候选的评估指标。 |
 | `opponent-shanten` | 预测其他座位的向听分布，以及听牌条件下振听或无役的概率。 |
 | `opponent-deal-in-probability` | 预测受控座位向各对手打出34种牌时的铳率。 |
-| `opponent-concealed-tile-count` | 预测各对手暗牌中34种牌的数量。 |
+| `opponent-concealed-tile-count` | 预测各对手暗牌中34种牌的数量，可另行预测三种赤五。 |
 | `opponent-dora-count` | 提供各对手的宝牌数量预测。 |
 | `opponent-score` | 提供各对手的打点预测。 |
-| `wall-tile-count` | 预测尚未公开且仍留在牌山中的34种牌的数量。 |
+| `wall-tile-count` | 预测尚未公开且仍留在牌山中的34种牌数量，可另行预测三种赤五。 |
 | `kyoku-outcome` | 预测当前小局的流局概率，以及四家的和牌、放铳和条件目标概率。 |
 | `kyoku-score-delta` | 预测四家从当前位置到当前小局结算完成时的点数变化。 |
 | `match-placement` | 预测四家在当前对局结束时的顺位。 |
@@ -720,6 +720,15 @@
           ],
           "expectedValue": 0.56
         }
+      },
+      "redTiles": {
+        "5mr": {
+          "distribution": [
+            {"value": 0, "probability": 0.7},
+            {"value": 1, "probability": 0.3}
+          ],
+          "expectedValue": 0.3
+        }
       }
     }
   ]
@@ -727,6 +736,8 @@
 ```
 
 `players` 使用“座位”一节定义的其他座位。每个 `tiles` 必须恰好包含34种牌。离散分布存在时，取值必须是整数 `0..4`；未列出的取值概率为 `0`。`expectedValue` 或 `pointEstimate` 存在时，必须位于 `[0, 4]`。宿主可以从分布派生“至少持有一张”的概率 `1 - P(0)`。
+
+`redTiles` 可以省略；提供时必须恰好包含 `5mr`、`5pr`、`5sr`。离散分布的取值必须是整数 `0..1`，`expectedValue` 或 `pointEstimate` 必须位于 `[0, 1]`。
 
 ## `wall-tile-count`
 
@@ -743,6 +754,15 @@
       ],
       "expectedValue": 1.63
     }
+  },
+  "redTiles": {
+    "5mr": {
+      "distribution": [
+        {"value": 0, "probability": 0.4},
+        {"value": 1, "probability": 0.6}
+      ],
+      "expectedValue": 0.6
+    }
   }
 }
 ```
@@ -750,6 +770,8 @@
 输出表示当前事件完成后，尚未公开且仍留在牌山中的各种牌的数量。它只表示整个未公开牌山 `all-unrevealed-wall`，不区分活牌区域和王牌区域，也不提供区域字段。
 
 `tiles` 必须恰好包含34种牌。离散分布存在时，取值必须是整数 `0..4`；未列出的取值概率为 `0`。`expectedValue` 或 `pointEstimate` 存在时，必须位于 `[0, 4]`。
+
+`redTiles` 可以省略；提供时必须恰好包含 `5mr`、`5pr`、`5sr`。离散分布的取值必须是整数 `0..1`，`expectedValue` 或 `pointEstimate` 必须位于 `[0, 1]`。
 
 ## `opponent-dora-count`
 
