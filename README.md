@@ -1,5 +1,8 @@
 ### [中文](#%E4%B8%AD%E6%96%87) | [日本語](#%E6%97%A5%E6%9C%AC%E8%AA%9E) | [English](#english)
 
+[![License](https://img.shields.io/badge/license-Apache--2.0-blue.svg)](LICENSE)
+[![JSON-RPC 2.0](https://img.shields.io/badge/JSON--RPC-2.0-6f42c1)](https://www.jsonrpc.org/specification)
+
 ---
 
 <div lang="zh-CN">
