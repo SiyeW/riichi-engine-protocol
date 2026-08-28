@@ -19,8 +19,6 @@
 
 [阅读中文协议规范](protocol.zh-CN.md)
 
-另有[日文版](protocol.ja-JP.md)和[英文版](protocol.en-US.md)。
-
 ### 相关项目与许可证
 
 - [riichi-mahjong-studio](https://github.com/SiyeW/riichi-mahjong-studio)：一款使用本协议的立直麻将牌谱研究和对局练习桌面程序
@@ -45,8 +43,6 @@
 
 [日本語のプロトコル仕様を読む](protocol.ja-JP.md)
 
-[中国語版](protocol.zh-CN.md)と[英語版](protocol.en-US.md)もあります。
-
 ### 関連プロジェクトとライセンス
 
 - [riichi-mahjong-studio](https://github.com/SiyeW/riichi-mahjong-studio)：本プロトコルに対応する、リーチ麻雀の牌譜検討と対局練習のためのデスクトップアプリケーション
@@ -70,8 +66,6 @@ Each engine declares the outputs it can provide. One engine may combine action r
 ### Protocol specification
 
 [Read the protocol specification in English](protocol.en-US.md)
-
-[Chinese](protocol.zh-CN.md) and [Japanese](protocol.ja-JP.md) versions are also available.
 
 ### Related projects and license
 

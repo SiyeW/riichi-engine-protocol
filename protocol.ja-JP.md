@@ -1,3 +1,5 @@
+### [中文](protocol.zh-CN.md) | [日本語](protocol.ja-JP.md) | [English](protocol.en-US.md)
+
 <div lang="ja-JP">
 
 # Riichi Engine Protocol
