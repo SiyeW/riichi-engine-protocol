@@ -23,10 +23,6 @@
 
 - [riichi-mahjong-studio](https://github.com/SiyeW/riichi-mahjong-studio)：一款使用本协议的立直麻将牌谱研究和对局练习桌面程序
 
-### 许可证
-
-本项目采用 [Apache License 2.0](LICENSE)。
-
 </div>
 
 ---
@@ -49,10 +45,6 @@
 
 - [riichi-mahjong-studio](https://github.com/SiyeW/riichi-mahjong-studio)：本プロトコルに対応する、リーチ麻雀の牌譜検討と対局練習のためのデスクトップアプリケーション
 
-### ライセンス
-
-本プロジェクトは [Apache License 2.0](LICENSE) で提供されます。
-
 </div>
 
 ---
@@ -74,9 +66,5 @@ Each engine declares the outputs it can provide. One engine may combine action r
 ### Related projects
 
 - [riichi-mahjong-studio](https://github.com/SiyeW/riichi-mahjong-studio): a desktop application for studying Riichi Mahjong game records and practicing games using this protocol
-
-### License
-
-This project is licensed under the [Apache License 2.0](LICENSE).
 
 </div>
