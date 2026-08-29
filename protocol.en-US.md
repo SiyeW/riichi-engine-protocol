@@ -264,19 +264,19 @@ The host must retain every physically distinct candidate, including tsumogiri an
 
 ## Standard output contracts
 
-| Output contract ID | Meaning |
-| --- | --- |
-| `action-recommendation` | Recommend a candidate from the legal action candidates provided by the host, and can provide evaluation metrics for each candidate. |
-| `opponent-shanten` | Predict each opponent's shanten distribution and, conditional on tenpai, the probability of furiten or no yaku. |
-| `opponent-deal-in-probability` | Predict the deal-in probability when controlled seats play the 34 tile types to each opponent. |
-| `opponent-concealed-tile-count` | Predict the 34 tile-type counts in each opponent's concealed tiles, with optional separate red-five counts. |
-| `opponent-dora-count` | Provide a dora-count prediction for each opponent. |
-| `opponent-score` | Provides score predictions for each opponent. |
-| `wall-tile-count` | Predict the 34 tile-type counts that remain unrevealed in the wall, with optional separate red-five counts. |
-| `kyoku-outcome` | Provide draw, win, and deal-in probabilities for the current kyoku, or a distribution of mutually exclusive final outcomes. |
-| `kyoku-score-delta` | Predict each player's score change from the current position through settlement of the current kyoku. |
-| `match-placement` | Predict each player's final placement when the current match ends. |
-| `match-score` | Predict each player's final point-stick score when the current match ends. |
+| Output contract ID | Version | Meaning |
+| --- | ---: | --- |
+| `action-recommendation` | 1 | Recommend a candidate from the legal action candidates provided by the host, and can provide evaluation metrics for each candidate. |
+| `opponent-shanten` | 1 | Predict each opponent's shanten distribution and, conditional on tenpai, the probability of furiten or no yaku. |
+| `opponent-deal-in-probability` | 1 | Predict the deal-in probability when controlled seats play the 34 tile types to each opponent. |
+| `opponent-concealed-tile-count` | 1 | Predict the 34 tile-type counts in each opponent's concealed tiles, with optional separate red-five counts. |
+| `opponent-dora-count` | 1 | Provide a dora-count prediction for each opponent. |
+| `opponent-score` | 1 | Provides score predictions for each opponent. |
+| `wall-tile-count` | 1 | Predict the 34 tile-type counts that remain unrevealed in the wall, with optional separate red-five counts. |
+| `kyoku-outcome` | 2 | Provide draw, win, and deal-in probabilities for the current kyoku, or a distribution of mutually exclusive final outcomes. |
+| `kyoku-score-delta` | 1 | Predict each player's score change from the current position through settlement of the current kyoku. |
+| `match-placement` | 1 | Predict each player's final placement when the current match ends. |
+| `match-score` | 1 | Predict each player's final point-stick score when the current match ends. |
 
 `opponent-dora-count` and `opponent-score` each specify the recommended statistical interpretation. The protocol does not require the engine to adopt this interpretation, nor does it set additional declaration fields for other interpretations. The host parses the results according to the output structure, numerical range, and the representation determined at initialization.
 

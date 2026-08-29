@@ -264,19 +264,19 @@
 
 ## 标准输出契约
 
-| 输出契约 ID | 意义 |
-| --- | --- |
-| `action-recommendation` | 从宿主提供的合法动作候选中推荐一个候选，并可提供各候选的评估指标。 |
-| `opponent-shanten` | 预测其他座位的向听分布，以及听牌条件下振听或无役的概率。 |
-| `opponent-deal-in-probability` | 预测受控座位向各对手打出34种牌时的铳率。 |
-| `opponent-concealed-tile-count` | 预测各对手暗牌中34种牌的数量，可另行预测三种赤五。 |
-| `opponent-dora-count` | 提供各对手的宝牌数量预测。 |
-| `opponent-score` | 提供各对手的打点预测。 |
-| `wall-tile-count` | 预测尚未公开且仍留在牌山中的34种牌数量，可另行预测三种赤五。 |
-| `kyoku-outcome` | 提供当前小局的流局、和牌和放铳概率，或互斥的最终结果分布。 |
-| `kyoku-score-delta` | 预测四家从当前位置到当前小局结算完成时的点数变化。 |
-| `match-placement` | 预测四家在当前对局结束时的顺位。 |
-| `match-score` | 预测四家在当前对局结束时的点棒分数。 |
+| 输出契约 ID | 版本 | 意义 |
+| --- | ---: | --- |
+| `action-recommendation` | 1 | 从宿主提供的合法动作候选中推荐一个候选，并可提供各候选的评估指标。 |
+| `opponent-shanten` | 1 | 预测其他座位的向听分布，以及听牌条件下振听或无役的概率。 |
+| `opponent-deal-in-probability` | 1 | 预测受控座位向各对手打出34种牌时的铳率。 |
+| `opponent-concealed-tile-count` | 1 | 预测各对手暗牌中34种牌的数量，可另行预测三种赤五。 |
+| `opponent-dora-count` | 1 | 提供各对手的宝牌数量预测。 |
+| `opponent-score` | 1 | 提供各对手的打点预测。 |
+| `wall-tile-count` | 1 | 预测尚未公开且仍留在牌山中的34种牌数量，可另行预测三种赤五。 |
+| `kyoku-outcome` | 2 | 提供当前小局的流局、和牌和放铳概率，或互斥的最终结果分布。 |
+| `kyoku-score-delta` | 1 | 预测四家从当前位置到当前小局结算完成时的点数变化。 |
+| `match-placement` | 1 | 预测四家在当前对局结束时的顺位。 |
+| `match-score` | 1 | 预测四家在当前对局结束时的点棒分数。 |
 
 `opponent-dora-count` 和 `opponent-score` 各自规定推荐的统计解释。协议不要求引擎采用该解释，也不为其他解释设置额外声明字段。宿主按照输出的结构、数值范围和初始化时确定的表示解析结果。
 
