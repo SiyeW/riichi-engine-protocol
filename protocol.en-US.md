@@ -273,7 +273,7 @@ The host must retain every physically distinct candidate, including tsumogiri an
 | `opponent-dora-count` | Provide a dora-count prediction for each opponent. |
 | `opponent-score` | Provides score predictions for each opponent. |
 | `wall-tile-count` | Predict the 34 tile-type counts that remain unrevealed in the wall, with optional separate red-five counts. |
-| `kyoku-outcome` | Predict the probability that the current kyoku ends in a draw and each player's win, deal-in, and conditional target probabilities. |
+| `kyoku-outcome` | Provide draw, win, and deal-in probabilities for the current kyoku, or a distribution of mutually exclusive final outcomes. |
 | `kyoku-score-delta` | Predict each player's score change from the current position through settlement of the current kyoku. |
 | `match-placement` | Predict each player's final placement when the current match ends. |
 | `match-score` | Predict each player's final point-stick score when the current match ends. |
@@ -828,37 +828,44 @@ Under this interpretation, a ron score is the amount paid by the discarder for t
 
 The protocol only requires `players` to follow the “Seats” section, discrete values to be nonnegative integer points, and `expectedValue` and `pointEstimate` to be at least `0`. The engine need not use the recommended statistical interpretation. It may use this output for a score prediction with another meaning, and the host still parses the same data structure.
 
-## `kyoku-outcome`
+## `kyoku-outcome` v2
 
 ```json
 {
   "drawProbability": 0.25,
   "players": [
-    {
-      "seat": 0,
-      "winProbability": 0.30,
-      "dealInProbability": 0.06,
-      "targetGivenWin": [
-        {"seat": 0, "probability": 0.42},
-        {"seat": 1, "probability": 0.18},
-        {"seat": 2, "probability": 0.21},
-        {"seat": 3, "probability": 0.19}
-      ]
-    }
+    {"seat": 0, "winProbability": 0.15, "dealInProbability": 0.50},
+    {"seat": 1, "winProbability": 0.20, "dealInProbability": 0.10},
+    {"seat": 2, "winProbability": 0.40, "dealInProbability": 0.00},
+    {"seat": 3, "winProbability": 0.30, "dealInProbability": 0.00}
+  ],
+  "outcomes": [
+    {"type": "draw", "probability": 0.25},
+    {"type": "tsumo", "winner": 0, "probability": 0.15},
+    {"type": "ron", "winners": [1], "target": 0, "probability": 0.20},
+    {"type": "ron", "winners": [2], "target": 1, "probability": 0.10},
+    {"type": "ron", "winners": [2, 3], "target": 0, "probability": 0.30}
   ]
 }
 ```
 
 | Field | Required | Format and meaning |
 | --- | --- | --- |
-| `drawProbability` | Yes | `P(the current kyoku ends in a draw)`, including exhaustive and abortive draws. |
-| `players` | Yes | Each absolute seat `0..3`, exactly once. |
+| `drawProbability` | Conditional | Direct prediction of `P(the current kyoku ends in a draw)`, including exhaustive and abortive draws. Provided together with `players`. |
+| `players` | Conditional | Direct win and deal-in predictions for all four players. Contains each absolute seat `0..3` exactly once and is provided together with `drawProbability`. |
 | `players[].seat` | Yes | The player's absolute seat. |
 | `players[].winProbability` | Yes | `P(the player wins the current kyoku)`. |
 | `players[].dealInProbability` | Yes | `P(the player deals in during the current kyoku)`. |
-| `players[].targetGivenWin` | Yes | The conditional distribution `P(target = seat \| the player wins)`; contains each absolute seat `0..3` exactly once. For tsumo, `target` is the winner. |
+| `outcomes` | Conditional | Probability distribution over the mutually exclusive final outcomes of the current kyoku. |
+| `outcomes[].type` | Yes | `draw`, `tsumo`, or `ron`. |
+| `outcomes[].probability` | Yes | Probability of this final outcome. |
+| `outcomes[].winner` | Required when `type = "tsumo"` | Absolute seat of the tsumo winner. |
+| `outcomes[].winners` | Required when `type = "ron"` | Non-empty array of absolute seats that win by ron. Seats must be unique and must not include `target`. Multiple seats represent double or triple ron. |
+| `outcomes[].target` | Required when `type = "ron"` | Absolute seat of the player who deals in. |
 
-`1 - drawProbability` is the probability that at least one player wins. In a double or triple ron, more than one `winProbability` may apply.
+`drawProbability` and `players` form the direct summary. An engine must provide the direct summary, `outcomes`, or both. The two representations are independent predictions and need not agree.
+
+`outcomes` must not repeat the same final outcome. Draw, tsumo, and ron outcomes with different winner sets or targets are distinct. Seat fields that do not apply to an outcome must be omitted.
 
 ## `kyoku-score-delta`
 

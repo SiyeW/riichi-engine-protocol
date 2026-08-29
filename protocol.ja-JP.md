@@ -273,7 +273,7 @@
 | `opponent-dora-count` | 各対戦相手のドラ数を予測する。 |
 | `opponent-score` | 各対戦相手の打点予測を提供します。 |
 | `wall-tile-count` | まだ公開されておらず、牌山に残っている34種の牌を予測する。3種類の赤五は個別にも出力できる。 |
-| `kyoku-outcome` | 現在の局が流局する確率と、4人それぞれの和了、放銃、および条件付き target 確率を予測する。 |
+| `kyoku-outcome` | 現在の局の流局率・和了率・放銃率、または排他的な最終結果の分布を出力する。 |
 | `kyoku-score-delta` | 現在の局面から現在の局の精算完了までの各プレイヤーの持ち点変化を予測する。 |
 | `match-placement` | 現在の対局終了時における各プレイヤーの最終順位を予測する。 |
 | `match-score` | 現在の対局終了時における各プレイヤーの最終持ち点を予測する。 |
@@ -828,37 +828,44 @@
 
 プロトコルが要求するのは、`players` が「座席」の節に従うこと、離散値が非負整数の点数であること、`expectedValue` と `pointEstimate` が `0` 以上であることだけです。エンジンが上記の統計的解釈を採用する必要はありません。この出力を別の意味の打点予測に使用しても、ホストは同じデータ構造として解析します。
 
-## `kyoku-outcome`
+## `kyoku-outcome` v2
 
 ```json
 {
   "drawProbability": 0.25,
   "players": [
-    {
-      "seat": 0,
-      "winProbability": 0.30,
-      "dealInProbability": 0.06,
-      "targetGivenWin": [
-        {"seat": 0, "probability": 0.42},
-        {"seat": 1, "probability": 0.18},
-        {"seat": 2, "probability": 0.21},
-        {"seat": 3, "probability": 0.19}
-      ]
-    }
+    {"seat": 0, "winProbability": 0.15, "dealInProbability": 0.50},
+    {"seat": 1, "winProbability": 0.20, "dealInProbability": 0.10},
+    {"seat": 2, "winProbability": 0.40, "dealInProbability": 0.00},
+    {"seat": 3, "winProbability": 0.30, "dealInProbability": 0.00}
+  ],
+  "outcomes": [
+    {"type": "draw", "probability": 0.25},
+    {"type": "tsumo", "winner": 0, "probability": 0.15},
+    {"type": "ron", "winners": [1], "target": 0, "probability": 0.20},
+    {"type": "ron", "winners": [2], "target": 1, "probability": 0.10},
+    {"type": "ron", "winners": [2, 3], "target": 0, "probability": 0.30}
   ]
 }
 ```
 
 | フィールド | 必須 | 形式と意味 |
 | --- | --- | --- |
-| `drawProbability` | はい | `P(現在の局が流局する)`。荒牌流局と途中流局を含みます。 |
-| `players` | はい | 絶対座席 `0..3` をそれぞれ1回ずつ含む。 |
+| `drawProbability` | 条件付き | `P(現在の局が流局する)` の直接予測。荒牌流局と途中流局を含み、`players` と一緒に出力します。 |
+| `players` | 条件付き | 4人の和了率・放銃率の直接予測。絶対座席 `0..3` をそれぞれ1回ずつ含み、`drawProbability` と一緒に出力します。 |
 | `players[].seat` | はい | プレイヤーの絶対座席。 |
 | `players[].winProbability` | はい | `P(そのプレイヤーが現在の局で和了する)`。 |
 | `players[].dealInProbability` | はい | `P(そのプレイヤーが現在の局で放銃する)`。 |
-| `players[].targetGivenWin` | はい | 条件付き確率分布 `P(target = 座席 \| そのプレイヤーが和了する)`。絶対座席 `0..3` をそれぞれ1回ずつ含みます。ツモでは `target` と和了者が一致します。 |
+| `outcomes` | 条件付き | 現在の局における排他的な最終結果の確率分布。 |
+| `outcomes[].type` | はい | `draw`、`tsumo`、`ron` のいずれか。 |
+| `outcomes[].probability` | はい | その最終結果の確率。 |
+| `outcomes[].winner` | `type = "tsumo"` のとき必須 | ツモ和了者の絶対座席。 |
+| `outcomes[].winners` | `type = "ron"` のとき必須 | ロン和了者の絶対座席を収めた空でない配列。座席の重複と `target` は含めません。複数の座席はダブロンまたはトリプルロンを表します。 |
+| `outcomes[].target` | `type = "ron"` のとき必須 | 放銃者の絶対座席。 |
 
-`1 - drawProbability` は、少なくとも1人が和了する確率です。ダブロンやトリプルロンでは、複数の `winProbability` が同時に成立します。
+`drawProbability` と `players` が直接予測を構成します。直接予測と `outcomes` の少なくとも一方を出力し、両方を出力することもできます。両者は独立した予測であり、値が一致する必要はありません。
+
+`outcomes` には同じ最終結果を重複して含めません。流局、ツモ、および和了者の組み合わせや放銃者が異なるロンは別の結果です。その結果で使用しない座席フィールドは省略します。
 
 ## `kyoku-score-delta`
 

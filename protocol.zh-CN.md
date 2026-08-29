@@ -273,7 +273,7 @@
 | `opponent-dora-count` | 提供各对手的宝牌数量预测。 |
 | `opponent-score` | 提供各对手的打点预测。 |
 | `wall-tile-count` | 预测尚未公开且仍留在牌山中的34种牌数量，可另行预测三种赤五。 |
-| `kyoku-outcome` | 预测当前小局的流局概率，以及四家的和牌、放铳和条件目标概率。 |
+| `kyoku-outcome` | 提供当前小局的流局、和牌和放铳概率，或互斥的最终结果分布。 |
 | `kyoku-score-delta` | 预测四家从当前位置到当前小局结算完成时的点数变化。 |
 | `match-placement` | 预测四家在当前对局结束时的顺位。 |
 | `match-score` | 预测四家在当前对局结束时的点棒分数。 |
@@ -828,37 +828,44 @@
 
 协议只要求 `players` 符合“座位”一节，离散值为非负整数点数，`expectedValue` 和 `pointEstimate` 不得小于 `0`；不要求引擎采用上述统计解释。引擎可以用该输出表示其他打点预测，宿主仍按相同数据结构解析。
 
-## `kyoku-outcome`
+## `kyoku-outcome` v2
 
 ```json
 {
   "drawProbability": 0.25,
   "players": [
-    {
-      "seat": 0,
-      "winProbability": 0.30,
-      "dealInProbability": 0.06,
-      "targetGivenWin": [
-        {"seat": 0, "probability": 0.42},
-        {"seat": 1, "probability": 0.18},
-        {"seat": 2, "probability": 0.21},
-        {"seat": 3, "probability": 0.19}
-      ]
-    }
+    {"seat": 0, "winProbability": 0.15, "dealInProbability": 0.50},
+    {"seat": 1, "winProbability": 0.20, "dealInProbability": 0.10},
+    {"seat": 2, "winProbability": 0.40, "dealInProbability": 0.00},
+    {"seat": 3, "winProbability": 0.30, "dealInProbability": 0.00}
+  ],
+  "outcomes": [
+    {"type": "draw", "probability": 0.25},
+    {"type": "tsumo", "winner": 0, "probability": 0.15},
+    {"type": "ron", "winners": [1], "target": 0, "probability": 0.20},
+    {"type": "ron", "winners": [2], "target": 1, "probability": 0.10},
+    {"type": "ron", "winners": [2, 3], "target": 0, "probability": 0.30}
   ]
 }
 ```
 
 | 字段 | 必需 | 格式与意义 |
 | --- | --- | --- |
-| `drawProbability` | 是 | `P(当前小局流局)`；包括荒牌流局和中途流局。 |
-| `players` | 是 | 恰好包含绝对座位 `0..3` 各一次，不受 `controlledSeat` 限制。 |
+| `drawProbability` | 条件必需 | 直接预测 `P(当前小局流局)`；包括荒牌流局和中途流局。与 `players` 同时提供。 |
+| `players` | 条件必需 | 直接预测四家的和牌和放铳概率；恰好包含绝对座位 `0..3` 各一次。与 `drawProbability` 同时提供。 |
 | `players[].seat` | 是 | 对应玩家的绝对座位。 |
 | `players[].winProbability` | 是 | `P(该玩家在当前小局中和牌)`。 |
 | `players[].dealInProbability` | 是 | `P(该玩家在当前小局中放铳)`。 |
-| `players[].targetGivenWin` | 是 | `P(target = 对应座位 \| 该玩家和牌)` 的条件概率分布；恰好包含绝对座位 `0..3` 各一次。自摸时 `target` 等于和牌玩家。 |
+| `outcomes` | 条件必需 | 当前小局互斥最终结果的概率分布。 |
+| `outcomes[].type` | 是 | `draw`、`tsumo` 或 `ron`。 |
+| `outcomes[].probability` | 是 | 对应最终结果的概率。 |
+| `outcomes[].winner` | `type = "tsumo"` 时必需 | 自摸玩家的绝对座位。 |
+| `outcomes[].winners` | `type = "ron"` 时必需 | 荣和玩家的非空绝对座位数组，不得重复或包含 `target`。多个玩家表示双响或三响。 |
+| `outcomes[].target` | `type = "ron"` 时必需 | 放铳玩家的绝对座位。 |
 
-`1 - drawProbability` 是至少一名玩家和牌的概率。双响或三响时，各家的 `winProbability` 可以同时成立。
+`drawProbability` 与 `players` 组成直接摘要。直接摘要和 `outcomes` 至少提供一种，也可以同时提供。两种表示是独立预测，协议不要求数值一致。
+
+`outcomes` 不得重复同一种最终结果。流局、自摸及不同和牌者组合的荣和均为不同结果；其余座位字段不得出现。
 
 ## `kyoku-score-delta`
 
