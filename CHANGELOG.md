@@ -6,7 +6,7 @@
 
 ### 中文
 
-- `kyoku-outcome` v2 可以提供四家的直接和牌、放铳概率以及包含双响、三响的互斥最终结果分布。
+- `kyoku-outcome` 可以提供四家的直接和牌、放铳概率以及包含双响、三响的互斥最终结果分布。
 - 数值预测新增 `point-estimate` 表示，可以同时提供离散分布和独立的标量预测。
 - 数值分布可以使用输出契约规定的字符串区间；宝牌数量支持以 `N+` 表示不小于 `N` 的数量。
 - 补充暗牌数量、牌山剩余数量等标量预测的取值范围。
@@ -19,7 +19,7 @@
 
 ### 日本語
 
-- `kyoku-outcome` v2 で、4 人の和了率・放銃率を直接出力できるほか、ダブロンやトリプルロンを含む排他的な局結果分布も出力できるようにしました。
+- `kyoku-outcome` で、4 人の和了率・放銃率を直接出力できるほか、ダブロンやトリプルロンを含む排他的な局結果分布も出力できるようにしました。
 - 数値予測に `point-estimate` を追加し、離散分布と独立したスカラー予測値を同時に出力できるようにしました。
 - 出力契約で定義された文字列の範囲を数値分布で使用できるようにし、ドラ数では `N` 以上を `N+` で表せるようにしました。
 - 手牌枚数や牌山の残り枚数など、スカラー予測値の範囲を明記しました。
@@ -32,7 +32,7 @@
 
 ### English
 
-- Allow `kyoku-outcome` v2 to provide direct win and deal-in probabilities for all four players, an exclusive outcome distribution including double and triple ron, or both.
+- Allow `kyoku-outcome` to provide direct win and deal-in probabilities for all four players, an exclusive outcome distribution including double and triple ron, or both.
 - Add `point-estimate` to numeric predictions so an engine can provide a discrete distribution and an independent scalar prediction together.
 - Allow numeric distributions to use string ranges defined by their output contract, including `N+` for dora counts of at least `N`.
 - Specify scalar ranges for concealed-hand tile counts, remaining wall tile counts, and related outputs.

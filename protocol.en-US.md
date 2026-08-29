@@ -649,6 +649,8 @@ Requests and results are associated with `id` via JSON-RPC. Results do not repea
 
 ## `opponent-shanten`
 
+Predicts each opponent's shanten distribution and, conditional on tenpai, the probability of furiten or no yaku.
+
 ```json
 {
   "players": [
@@ -685,6 +687,8 @@ Furiten or no yaku = P(shanten 0) × furitenOrNoYaku
 
 ## `opponent-deal-in-probability`
 
+Predicts the chance of dealing in to each opponent when the controlled seat discards each tile type.
+
 ```json
 {
   "players": [
@@ -703,6 +707,8 @@ Furiten or no yaku = P(shanten 0) × furitenOrNoYaku
 `players` uses other seats defined in the “Seats” section. Each `tiles` must contain exactly 34 types of tiles, with values representing the probability of the corresponding player winning when the controlled seat plays that tile. The tile types in the example are excerpts; the actual results must not be omitted.
 
 ## `opponent-concealed-tile-count`
+
+Predicts the count of each tile type in every opponent's concealed hand.
 
 ```json
 {
@@ -741,6 +747,8 @@ Furiten or no yaku = P(shanten 0) × furitenOrNoYaku
 
 ## `wall-tile-count`
 
+Predicts the count of each tile type that remains unrevealed in the wall.
+
 ```json
 {
   "tiles": {
@@ -775,6 +783,8 @@ The output indicates the number of each tile type that remains in the wall and h
 
 ## `opponent-dora-count`
 
+Predicts each opponent's dora count.
+
 ```json
 {
   "players": [
@@ -803,6 +813,8 @@ The protocol only requires `players` to follow the “Seats” section, discrete
 
 ## `opponent-score`
 
+Predicts each opponent's hand value.
+
 ```json
 {
   "players": [
@@ -828,7 +840,9 @@ Under this interpretation, a ron score is the amount paid by the discarder for t
 
 The protocol only requires `players` to follow the “Seats” section, discrete values to be nonnegative integer points, and `expectedValue` and `pointEstimate` to be at least `0`. The engine need not use the recommended statistical interpretation. It may use this output for a score prediction with another meaning, and the host still parses the same data structure.
 
-## `kyoku-outcome` v2
+## `kyoku-outcome`
+
+Predicts draw, win, and deal-in probabilities for the current kyoku, or a distribution of mutually exclusive final outcomes.
 
 ```json
 {
@@ -869,6 +883,8 @@ The protocol only requires `players` to follow the “Seats” section, discrete
 
 ## `kyoku-score-delta`
 
+Predicts each player's score change from the current position through settlement of the current kyoku.
+
 ```json
 {
   "players": [
@@ -887,6 +903,8 @@ The protocol only requires `players` to follow the “Seats” section, discrete
 Distribution values must be integer points and may be negative.
 
 ## `match-placement`
+
+Predicts each player's placement when the current match ends.
 
 ```json
 {
@@ -913,6 +931,8 @@ Distribution values must be integers `1..4`; `expectedValue` and `pointEstimate`
 
 ## `match-score`
 
+Predicts each player's point-stick score when the current match ends.
+
 ```json
 {
   "players": [
@@ -931,6 +951,8 @@ Distribution values must be integers `1..4`; `expectedValue` and `pointEstimate`
 Distribution values must be integer points and may be negative.
 
 ## `action-recommendation`
+
+Recommends among the controlled seat's legal action candidates and may provide evaluation metrics.
 
 ### Request parameters
 
