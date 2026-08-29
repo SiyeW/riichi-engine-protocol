@@ -20,11 +20,11 @@ The protocol identifier is fixed as:
 }
 ```
 
-Parties with different `major` must not continue communication. In the `engine.hello` request, the host provides the highest `minor` it supports; the engine returns the highest `minor` that both sides support, which must not exceed the value requested by the host. Increasing `minor` may only add ignorable fields, methods, or capabilities and must not change the meaning of existing fields and methods.
+Parties with different `major` versions must not continue communication. Within the same `major`, hosts and engines must support every `minor` from `0` through their declared maximum. In the `engine.hello` request, the host provides the highest `minor` it supports; the engine returns the highest `minor` supported by both sides, which must not exceed the value requested by the host.
 
 The `engine.hello` result and all subsequent messages must conform to the negotiated `minor`. The engine must not use fields, values, methods, or capabilities introduced by a higher `minor`.
 
-Output contracts have independent versions. Having the same protocol version does not mean that both parties support the same outputs; the host only uses outputs it recognizes and that the engine has declared. The engine declaring additional outputs must not cause the host to reject the entire engine.
+Having the same protocol version does not mean that both parties support the same outputs; the host only uses outputs it recognizes and that the engine has declared. Declaring additional outputs must not cause the host to reject the entire engine.
 
 ## Process and transport
 
@@ -108,17 +108,13 @@ Output references are used in handshakes, initialization, and analysis requests:
 
 ```json
 {
-  "id": "opponent-shanten",
-  "version": 1
+  "id": "opponent-shanten"
 }
 ```
 
 | Field | Required | Format and Meaning |
 | --- | --- | --- |
 | `id` | Yes | the stable ID of the output contract. Use lowercase ASCII letters, numbers, and hyphens, with a length of `3..128`. |
-| `version` | Yes | Output contract major version; an integer of at least `1`. |
-
-When changing the meaning of a field, probability conditions, target definitions, or deleting existing fields, `version` must be increased. Adding optional fields that the receiver can ignore does not require increasing the major version.
 
 ### Multilingual text
 
@@ -264,19 +260,19 @@ The host must retain every physically distinct candidate, including tsumogiri an
 
 ## Standard output contracts
 
-| Output contract ID | Version | Meaning |
-| --- | ---: | --- |
-| `action-recommendation` | 1 | Recommend a candidate from the legal action candidates provided by the host, and can provide evaluation metrics for each candidate. |
-| `opponent-shanten` | 1 | Predict each opponent's shanten distribution and, conditional on tenpai, the probability of furiten or no yaku. |
-| `opponent-deal-in-probability` | 1 | Predict the deal-in probability when controlled seats play the 34 tile types to each opponent. |
-| `opponent-concealed-tile-count` | 1 | Predict the 34 tile-type counts in each opponent's concealed tiles, with optional separate red-five counts. |
-| `opponent-dora-count` | 1 | Provide a dora-count prediction for each opponent. |
-| `opponent-score` | 1 | Provides score predictions for each opponent. |
-| `wall-tile-count` | 1 | Predict the 34 tile-type counts that remain unrevealed in the wall, with optional separate red-five counts. |
-| `kyoku-outcome` | 2 | Provide draw, win, and deal-in probabilities for the current kyoku, or a distribution of mutually exclusive final outcomes. |
-| `kyoku-score-delta` | 1 | Predict each player's score change from the current position through settlement of the current kyoku. |
-| `match-placement` | 1 | Predict each player's final placement when the current match ends. |
-| `match-score` | 1 | Predict each player's final point-stick score when the current match ends. |
+| Output contract ID | Meaning |
+| --- | --- |
+| `action-recommendation` | Recommend one of the legal action candidates provided by the host, with optional evaluation metrics for each candidate. |
+| `opponent-shanten` | Predict each opponent's shanten distribution and, conditional on tenpai, the probability of furiten or no yaku. |
+| `opponent-deal-in-probability` | Predict the deal-in probability when controlled seats play the 34 tile types to each opponent. |
+| `opponent-concealed-tile-count` | Predict the 34 tile-type counts in each opponent's concealed tiles, with optional separate red-five counts. |
+| `opponent-dora-count` | Provide a dora-count prediction for each opponent. |
+| `opponent-score` | Provide score predictions for each opponent. |
+| `wall-tile-count` | Predict the 34 tile-type counts that remain unrevealed in the wall, with optional separate red-five counts. |
+| `kyoku-outcome` | Provide draw, win, and deal-in probabilities for the current kyoku, or a distribution of mutually exclusive final outcomes. |
+| `kyoku-score-delta` | Predict each player's score change from the current position through settlement of the current kyoku. |
+| `match-placement` | Predict each player's final placement when the current match ends. |
+| `match-score` | Predict each player's final point-stick score when the current match ends. |
 
 `opponent-dora-count` and `opponent-score` each specify the recommended statistical interpretation. The protocol does not require the engine to adopt this interpretation, nor does it set additional declaration fields for other interpretations. The host parses the results according to the output structure, numerical range, and the representation determined at initialization.
 
@@ -321,12 +317,10 @@ Successful result:
   },
   "outputContracts": [
     {
-      "id": "opponent-shanten",
-      "version": 1
+      "id": "opponent-shanten"
     },
     {
-      "id": "opponent-deal-in-probability",
-      "version": 1
+      "id": "opponent-deal-in-probability"
     }
   ],
   "weightSlots": [],
@@ -369,7 +363,6 @@ Each output declaration includes:
 | Field | Required | Format and Meaning |
 | --- | --- | --- |
 | `id` | Yes | the output contract ID. |
-| `version` | Yes | the main version of the output contract. |
 | `representations` | Conditionally required | Representations available for numeric predictions. Allowed values are `distribution`, `expected-value`, and `point-estimate`. |
 | `supportsRevealedHands` | No | Whether to accept revealed-hand input, default is `false`. |
 | `metrics` | Conditionally required | `action-recommendation` Evaluation indicators that can be provided; use an empty array if there are no indicators. |
@@ -430,8 +423,8 @@ The engine declares weight files that need user configuration in `engine.hello` 
         }
       ],
       "requiredForOutputs": [
-        {"id": "action-recommendation", "version": 1},
-        {"id": "opponent-dora-count", "version": 1}
+        {"id": "action-recommendation"},
+        {"id": "opponent-dora-count"}
       ]
     }
   ]
@@ -459,8 +452,8 @@ A single output can require multiple slots, and a single slot can be shared by m
 ```json
 {
   "enabledOutputs": [
-    {"id": "action-recommendation", "version": 1},
-    {"id": "opponent-dora-count", "version": 1}
+    {"id": "action-recommendation"},
+    {"id": "opponent-dora-count"}
   ],
   "weights": [
     {
@@ -497,7 +490,6 @@ The file summary is calculated by the host when it needs to identify the source 
   "outputs": [
     {
       "id": "action-recommendation",
-      "version": 1,
       "metrics": [
         {
           "id": "q-value",
@@ -525,7 +517,6 @@ The file summary is calculated by the host when it needs to identify the source 
     },
     {
       "id": "opponent-dora-count",
-      "version": 1,
       "representations": ["distribution", "point-estimate"],
       "supportsRevealedHands": true
     }
@@ -537,7 +528,7 @@ The file summary is calculated by the host when it needs to identify the source 
 }
 ```
 
-`outputs` must contain exactly one result with the same ID and version for every requested output. Array order has no protocol significance. Initialization may narrow the representations, evaluation metrics, or revealed-hand support declared during the handshake, but must not add capabilities. If any requested output cannot be provided, initialization fails as a whole; the engine must not silently remove it.
+`outputs` must contain exactly one result with the same ID for every requested output. Array order has no protocol significance. Initialization may narrow the representations, evaluation metrics, or revealed-hand support declared during the handshake, but must not add capabilities. If any requested output cannot be provided, initialization fails as a whole; the engine must not silently remove it.
 
 For numerical predictions, `representations` in the initialization results is a fixed representation that must be used every time a result is returned after the current configuration. For action recommendations, the rules for `metrics`, `primaryMetricId`, and `recommendationMetricId` are detailed in the 'Evaluation metric declarations.' The host arranges the interface according to these fixed statements; the interface structure must not be changed if a single result lacks data.
 
@@ -577,7 +568,6 @@ The engine uses `analysis.run` to receive business requests:
     "outputs": [
       {
         "id": "action-recommendation",
-        "version": 1,
         "parameters": {
           "candidates": [
             {
@@ -594,7 +584,6 @@ The engine uses `analysis.run` to receive business requests:
       },
       {
         "id": "opponent-dora-count",
-        "version": 1,
         "parameters": {}
       }
     ]
@@ -610,7 +599,6 @@ The engine uses `analysis.run` to receive business requests:
 | `events` | Yes | the array of standard events that conform to the input pattern up to the current position. |
 | `outputs` | Yes | the non-empty output array for this request, which must not contain duplicates. |
 | `outputs[].id` | Yes | the initialized output contract ID. |
-| `outputs[].version` | Yes | the initialized main version of the output contract. |
 | `outputs[].parameters` | Yes | Parameters defined by the output contract; use `{}` when it defines none. |
 
 All outputs in the same request use the same history, controlled seats, and input patterns. Only outputs delivered to the same initialized engine configuration can be merged. The engine must return all outputs in the request and must not add extra outputs; if any output fails, the entire JSON-RPC request returns an error and does not return partial results.
@@ -624,12 +612,10 @@ Analysis Results:
   "outputs": [
     {
       "id": "action-recommendation",
-      "version": 1,
       "data": {}
     },
     {
       "id": "opponent-dora-count",
-      "version": 1,
       "data": {}
     }
   ],
@@ -1095,7 +1081,7 @@ When the state changes, the engine sends `engine.status` notification:
     "requestId": "host-41",
     "state": "running",
     "outputs": [
-      {"id": "action-recommendation", "version": 1}
+      {"id": "action-recommendation"}
     ]
   }
 }
@@ -1175,12 +1161,12 @@ Protocol compatibility does not mean the engine is trustworthy. The host must tr
 
 The protocol does not require the engine to generate or return source fingerprints. When results need to be cached, compared, or shown with their source, the host generates a stable identifier from what it actually launched and supplied. The identifier must cover every input that may change the result, including at least:
 
-- Will affect the digest of the engine package file or executable file for execution;
-- Summary of all currently used weight files;
-- Actual device types, effective parameters, and operating configurations that may affect numerical accuracy;
-- Output the contract ID and version;
-- Initialize the representation of the determined results, metric ID, metric format, and preferred direction;
-- A host post-processing version that will change the resulting values.
+- Digests of engine package files or executables that affect execution;
+- Digests of all weight files in use;
+- The actual device type, effective options, and runtime settings that affect numerical precision;
+- Output contract IDs;
+- Representations, metric IDs, metric formats, and preferred directions fixed at initialization;
+- Host post-processing versions that affect result values.
 
 The host generates a source identifier for each output separately. When the same engine configuration provides multiple outputs, the shared program, weights, and parameter parts can be reused. Local file paths, multilingual titles, and descriptions must not be included in the stable identifier. Temporary states such as the number of process restarts and request sequence numbers are managed using separate run generations and do not belong to the stable source identifier. The protocol does not specify the field names, storage locations, or hash algorithms for internal host identifiers.
 

@@ -20,11 +20,11 @@
 }
 ```
 
-`major` 不同的双方不得继续通信。宿主在 `engine.hello` 请求中给出自己支持的最高 `minor`；引擎返回双方共同支持的最高 `minor`，不得高于宿主请求值。提高 `minor` 只能增加可忽略的字段、方法或能力，不得改变现有字段和方法的意义。
+`major` 不同的双方不得继续通信。同一 `major` 下，宿主和引擎必须支持从 `0` 到自身最高 `minor` 的各个版本。宿主在 `engine.hello` 请求中给出自己支持的最高 `minor`；引擎返回双方共同支持的最高 `minor`，不得高于宿主请求值。
 
 `engine.hello` 的结果及之后的消息必须符合协商后的 `minor`；引擎不得使用更高 `minor` 才新增的字段、取值、方法或能力。
 
-输出契约具有独立版本。协议版本相同不表示双方支持相同输出；宿主只使用自己认识并且引擎已经声明的输出。引擎声明额外输出不得导致宿主拒绝整个引擎。
+协议版本相同不表示双方支持相同输出；宿主只使用自己认识并且引擎已经声明的输出。引擎声明额外输出不得导致宿主拒绝整个引擎。
 
 ## 进程与传输
 
@@ -108,17 +108,13 @@
 
 ```json
 {
-  "id": "opponent-shanten",
-  "version": 1
+  "id": "opponent-shanten"
 }
 ```
 
 | 字段 | 必需 | 格式与意义 |
 | --- | --- | --- |
 | `id` | 是 | 输出契约的稳定 ID。使用小写 ASCII 字母、数字和连字符，长度为 `3..128`。 |
-| `version` | 是 | 输出契约主版本，值为不小于 `1` 的整数。 |
-
-改变字段含义、概率条件、目标定义或删除既有字段时，必须提高 `version`。增加接收方可以忽略的可选字段不要求提高主版本。
 
 ### 多语言文本
 
@@ -264,19 +260,19 @@
 
 ## 标准输出契约
 
-| 输出契约 ID | 版本 | 意义 |
-| --- | ---: | --- |
-| `action-recommendation` | 1 | 从宿主提供的合法动作候选中推荐一个候选，并可提供各候选的评估指标。 |
-| `opponent-shanten` | 1 | 预测其他座位的向听分布，以及听牌条件下振听或无役的概率。 |
-| `opponent-deal-in-probability` | 1 | 预测受控座位向各对手打出34种牌时的铳率。 |
-| `opponent-concealed-tile-count` | 1 | 预测各对手暗牌中34种牌的数量，可另行预测三种赤五。 |
-| `opponent-dora-count` | 1 | 提供各对手的宝牌数量预测。 |
-| `opponent-score` | 1 | 提供各对手的打点预测。 |
-| `wall-tile-count` | 1 | 预测尚未公开且仍留在牌山中的34种牌数量，可另行预测三种赤五。 |
-| `kyoku-outcome` | 2 | 提供当前小局的流局、和牌和放铳概率，或互斥的最终结果分布。 |
-| `kyoku-score-delta` | 1 | 预测四家从当前位置到当前小局结算完成时的点数变化。 |
-| `match-placement` | 1 | 预测四家在当前对局结束时的顺位。 |
-| `match-score` | 1 | 预测四家在当前对局结束时的点棒分数。 |
+| 输出契约 ID | 意义 |
+| --- | --- |
+| `action-recommendation` | 从宿主提供的合法动作候选中推荐一个候选，并可提供各候选的评估指标。 |
+| `opponent-shanten` | 预测其他座位的向听分布，以及听牌条件下振听或无役的概率。 |
+| `opponent-deal-in-probability` | 预测受控座位向各对手打出34种牌时的铳率。 |
+| `opponent-concealed-tile-count` | 预测各对手暗牌中34种牌的数量，可另行预测三种赤五。 |
+| `opponent-dora-count` | 提供各对手的宝牌数量预测。 |
+| `opponent-score` | 提供各对手的打点预测。 |
+| `wall-tile-count` | 预测尚未公开且仍留在牌山中的34种牌数量，可另行预测三种赤五。 |
+| `kyoku-outcome` | 提供当前小局的流局、和牌和放铳概率，或互斥的最终结果分布。 |
+| `kyoku-score-delta` | 预测四家从当前位置到当前小局结算完成时的点数变化。 |
+| `match-placement` | 预测四家在当前对局结束时的顺位。 |
+| `match-score` | 预测四家在当前对局结束时的点棒分数。 |
 
 `opponent-dora-count` 和 `opponent-score` 各自规定推荐的统计解释。协议不要求引擎采用该解释，也不为其他解释设置额外声明字段。宿主按照输出的结构、数值范围和初始化时确定的表示解析结果。
 
@@ -321,12 +317,10 @@
   },
   "outputContracts": [
     {
-      "id": "opponent-shanten",
-      "version": 1
+      "id": "opponent-shanten"
     },
     {
-      "id": "opponent-deal-in-probability",
-      "version": 1
+      "id": "opponent-deal-in-probability"
     }
   ],
   "weightSlots": [],
@@ -369,7 +363,6 @@
 | 字段 | 必需 | 格式与意义 |
 | --- | --- | --- |
 | `id` | 是 | 输出契约 ID。 |
-| `version` | 是 | 输出契约主版本。 |
 | `representations` | 条件必需 | 数值预测可以使用的表示，允许值为 `distribution`、`expected-value`、`point-estimate`。 |
 | `supportsRevealedHands` | 否 | 是否接受明牌输入，默认 `false`。 |
 | `metrics` | 条件必需 | `action-recommendation` 可以提供的评估指标；没有指标时使用空数组。 |
@@ -430,8 +423,8 @@
         }
       ],
       "requiredForOutputs": [
-        {"id": "action-recommendation", "version": 1},
-        {"id": "opponent-dora-count", "version": 1}
+        {"id": "action-recommendation"},
+        {"id": "opponent-dora-count"}
       ]
     }
   ]
@@ -459,8 +452,8 @@
 ```json
 {
   "enabledOutputs": [
-    {"id": "action-recommendation", "version": 1},
-    {"id": "opponent-dora-count", "version": 1}
+    {"id": "action-recommendation"},
+    {"id": "opponent-dora-count"}
   ],
   "weights": [
     {
@@ -497,7 +490,6 @@
   "outputs": [
     {
       "id": "action-recommendation",
-      "version": 1,
       "metrics": [
         {
           "id": "q-value",
@@ -525,7 +517,6 @@
     },
     {
       "id": "opponent-dora-count",
-      "version": 1,
       "representations": ["distribution", "point-estimate"],
       "supportsRevealedHands": true
     }
@@ -537,7 +528,7 @@
 }
 ```
 
-`outputs` 必须为请求中的每个输出提供且只提供一个同 ID、同版本的结果，数组顺序不具有协议意义。初始化结果可以把握手中声明的表示、评估指标或明牌能力收窄，但不得增加能力。无法提供任一请求输出时，初始化整体失败，不得静默删除输出。
+`outputs` 必须为请求中的每个输出提供且只提供一个同 ID 的结果，数组顺序不具有协议意义。初始化结果可以把握手中声明的表示、评估指标或明牌能力收窄，但不得增加能力。无法提供任一请求输出时，初始化整体失败，不得静默删除输出。
 
 对于数值预测，初始化结果中的 `representations` 是当前配置之后每次返回结果时必须使用的固定表示。对于动作推荐，`metrics`、`primaryMetricId` 和 `recommendationMetricId` 的规则见“评估指标声明”。宿主根据这些固定声明安排界面；单次结果缺少数据时不得改变界面结构。
 
@@ -577,7 +568,6 @@
     "outputs": [
       {
         "id": "action-recommendation",
-        "version": 1,
         "parameters": {
           "candidates": [
             {
@@ -594,7 +584,6 @@
       },
       {
         "id": "opponent-dora-count",
-        "version": 1,
         "parameters": {}
       }
     ]
@@ -610,7 +599,6 @@
 | `events` | 是 | 到当前位置为止、符合输入模式的规范事件数组。 |
 | `outputs` | 是 | 本次请求的非空输出数组，不得重复。 |
 | `outputs[].id` | 是 | 已初始化的输出契约 ID。 |
-| `outputs[].version` | 是 | 已初始化的输出契约主版本。 |
 | `outputs[].parameters` | 是 | 输出契约定义的请求参数，没有专用参数时使用 `{}`。 |
 
 同一请求中的所有输出使用相同的历史、受控座位和输入模式。只有交给同一个已初始化引擎配置的输出才能合并。引擎必须返回请求中的全部输出且不得增加额外输出；任一输出失败时，整个 JSON-RPC 请求返回错误，不返回部分结果。
@@ -624,12 +612,10 @@
   "outputs": [
     {
       "id": "action-recommendation",
-      "version": 1,
       "data": {}
     },
     {
       "id": "opponent-dora-count",
-      "version": 1,
       "data": {}
     }
   ],
@@ -1095,7 +1081,7 @@
     "requestId": "host-41",
     "state": "running",
     "outputs": [
-      {"id": "action-recommendation", "version": 1}
+      {"id": "action-recommendation"}
     ]
   }
 }
@@ -1178,7 +1164,7 @@
 - 会影响执行的引擎程序包文件或可执行文件摘要；
 - 当前使用的全部权重文件摘要；
 - 实际设备类型、有效参数以及会影响数值精度的运行配置；
-- 输出契约 ID 和版本；
+- 输出契约 ID；
 - 初始化结果确定的表示、指标 ID、指标格式和偏好方向；
 - 会改变结果数值的宿主后处理版本。
 
