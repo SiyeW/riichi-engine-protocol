@@ -140,6 +140,8 @@ The host tries the complete language tag, the primary language tag, and `default
 
 The probability must be a finite JSON number within the closed interval `[0, 1]`, and cannot be `NaN` or infinity. The sum of the probabilities in the probability distribution must be `1` within a `1e-4` tolerance.
 
+A sender may use exact `0` and `1` to mark events known to be impossible or certain. A receiver must preserve these endpoints instead of replacing them with approximations. This applies to standalone probabilities, conditional probabilities, and `probability` values in discrete distributions.
+
 Discrete distributions use the following structure:
 
 ```json

@@ -6,6 +6,7 @@
 
 ### 中文
 
+- 概率可以使用精确的 `0` 和 `1` 表示已知不可能和必然发生的事件；接收方必须保留这些端点。
 - `kyoku-outcome` 使用包含自摸、荣和、双响和三响的互斥最终结果分布取代和牌目标条件概率；四家的和牌、放铳概率也可以单独提供。
 - 输出引用不再包含单独的 `version`；输出结构由协商后的协议版本确定。
 - 数值预测新增 `point-estimate` 表示，可以同时提供离散分布和独立的标量预测。
@@ -20,6 +21,7 @@
 
 ### 日本語
 
+- 確実に起こらない事象と必ず起こる事象を、確率の正確な `0` と `1` で表せることを明記しました。受信側はこれらの値をそのまま保持します。
 - `kyoku-outcome` の和了対象条件確率を、ツモ、ロン、ダブロン、トリプルロンを含む排他的な局結果分布に置き換えました。4人の和了率と放銃率だけを出力することもできます。
 - 出力参照から個別の `version` を削除し、合意したプロトコルバージョンで出力構造を決めるようにしました。
 - 数値予測に `point-estimate` を追加し、離散分布と独立したスカラー予測値を同時に出力できるようにしました。
@@ -34,6 +36,7 @@
 
 ### English
 
+- Clarify that exact `0` and `1` may represent known impossible and certain events, and that receivers preserve these values.
 - Replace `kyoku-outcome`'s conditional win-target probabilities with mutually exclusive outcomes covering tsumo, ron, double ron, and triple ron. Engines may also provide only the four players' direct win and deal-in probabilities.
 - Remove the separate `version` from output references; the negotiated protocol version now determines each output's structure.
 - Add `point-estimate` to numeric predictions so an engine can provide a discrete distribution and an independent scalar prediction together.
