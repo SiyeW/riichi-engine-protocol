@@ -276,7 +276,7 @@ The host must retain every physically distinct candidate, including tsumogiri an
 | `match-placement` | Predict each player's final placement when the current match ends. |
 | `match-score` | Predict each player's final point-stick score when the current match ends. |
 
-`opponent-dora-count` and `opponent-score` each specify the recommended statistical interpretation. The protocol does not require the engine to adopt this interpretation, nor does it set additional declaration fields for other interpretations. The host parses the results according to the output structure, numerical range, and the representation determined at initialization.
+The statistical interpretations of `opponent-dora-count` and `opponent-score` are defaults. Engines may use other interpretations without additional declaration fields. The host parses results according to the output structure, numerical range, and representation determined at initialization.
 
 ## Handshake and output capabilities
 
@@ -793,11 +793,11 @@ Predicts each opponent's dora count.
 }
 ```
 
-The recommended statistical interpretation is the total number of dora counted when the corresponding player wins the current hand, conditional on that player eventually winning. Ron and tsumo are not distinguished. The count includes regular dora and red fives; after a riichi win, it also includes ura-dora revealed at settlement. Dora indicators that have not yet been determined are part of the prediction.
+Predicts the total number of dora the corresponding player holds in the current analysis frame, including regular dora and red fives in concealed tiles and revealed melds. Regular dora are counted using the currently revealed dora indicators. Unrevealed ura-dora and dora from future additional indicators are excluded.
 
-Under this interpretation, the output is not the number of dora currently known to be in the player's hand, and it is not multiplied by the probability that the player eventually wins.
+The prediction is not conditional on the player eventually winning and is not multiplied by their win probability.
 
-The protocol only requires `players` to follow the “Seats” section, discrete values to be nonnegative integers or strings in the form `N+`, and `expectedValue` and `pointEstimate` to be at least `0`. The engine need not use the recommended statistical interpretation. `N` is a nonnegative decimal integer without unnecessary leading zeroes, and `N+` means at least `N`. A distribution may contain at most one `N+` value and must not also contain numeric values greater than or equal to `N`. The engine may use this output for a dora-count prediction with another meaning, and the host still parses the same data structure.
+`players` must follow the “Seats” section, discrete values must be nonnegative integers or strings in the form `N+`, and `expectedValue` and `pointEstimate` must be at least `0`. `N` is a nonnegative decimal integer without unnecessary leading zeroes, and `N+` means at least `N`. A distribution may contain at most one `N+` value and must not also contain numeric values greater than or equal to `N`.
 
 ## `opponent-score`
 
@@ -822,11 +822,11 @@ Predicts each opponent's hand value.
 }
 ```
 
-The recommended statistical interpretation is the score produced by the corresponding player's hand at settlement, conditional on that player eventually winning the current hand. Ron and tsumo are not distinguished. The value excludes honba payments, riichi sticks, deposits, and other table awards.
+Predicts the score produced by the corresponding player's hand at settlement, conditional on that player eventually winning the current hand. Ron and tsumo are not distinguished. The value excludes honba payments, riichi sticks, deposits, and other table awards.
 
-Under this interpretation, a ron score is the amount paid by the discarder for the hand; a tsumo score is the total paid by the other three players for the hand. The discrete distribution uses actual score values, while `expectedValue` and `pointEstimate` may fall between them. The output is not multiplied by the probability that the player eventually wins.
+A ron score is the amount paid by the discarder for the hand; a tsumo score is the total paid by the other three players for the hand. The discrete distribution uses actual score values, while `expectedValue` and `pointEstimate` may fall between them. The output is not multiplied by the probability that the player eventually wins.
 
-The protocol only requires `players` to follow the “Seats” section, discrete values to be nonnegative integer points, and `expectedValue` and `pointEstimate` to be at least `0`. The engine need not use the recommended statistical interpretation. It may use this output for a score prediction with another meaning, and the host still parses the same data structure.
+`players` must follow the “Seats” section, discrete values must be nonnegative integer points, and `expectedValue` and `pointEstimate` must be at least `0`.
 
 ## `kyoku-outcome`
 

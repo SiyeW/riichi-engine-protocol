@@ -11,6 +11,7 @@
 - 输出引用不再包含单独的 `version`；输出结构由协商后的协议版本确定。
 - 数值预测新增 `point-estimate` 表示，可以同时提供离散分布和独立的标量预测。
 - 数值分布可以使用输出契约规定的字符串区间；宝牌数量支持以 `N+` 表示不小于 `N` 的数量。
+- 宝牌数量的默认统计解释改为当前持有的宝牌总数，按已公开的宝牌指示牌计数，包括赤宝牌，不以最终和牌为条件。
 - 补充暗牌数量、牌山剩余数量等标量预测的取值范围。
 - 暗牌和牌山枚数预测可以分别输出三种赤五的数量。
 - 协商到较低 `minor` 时，引擎不会使用更高版本新增的协议内容。
@@ -26,6 +27,7 @@
 - 出力参照から個別の `version` を削除し、合意したプロトコルバージョンで出力構造を決めるようにしました。
 - 数値予測に `point-estimate` を追加し、離散分布と独立したスカラー予測値を同時に出力できるようにしました。
 - 出力契約で定義された文字列の範囲を数値分布で使用できるようにし、ドラ数では `N` 以上を `N+` で表せるようにしました。
+- ドラ数の既定の統計的解釈を、現在公開されているドラ表示牌に基づく現在の所持枚数に変更しました。赤ドラを含み、最終的な和了を条件としません。
 - 手牌枚数や牌山の残り枚数など、スカラー予測値の範囲を明記しました。
 - 手牌と牌山の枚数予測で、3種類の赤五を個別に出力できるようにしました。
 - 低い `minor` で合意した場合、エンジンはそれより新しいバージョンで追加されたプロトコル要素を使用しません。
@@ -41,6 +43,7 @@
 - Remove the separate `version` from output references; the negotiated protocol version now determines each output's structure.
 - Add `point-estimate` to numeric predictions so an engine can provide a discrete distribution and an independent scalar prediction together.
 - Allow numeric distributions to use string ranges defined by their output contract, including `N+` for dora counts of at least `N`.
+- Change the default interpretation of dora counts to the total currently held, based on revealed dora indicators and including red fives, without conditioning on an eventual win.
 - Specify scalar ranges for concealed-hand tile counts, remaining wall tile counts, and related outputs.
 - Allow concealed-hand and wall count predictions to report each of the three red fives separately.
 - Prevent engines from using protocol additions from a higher `minor` after negotiating a lower version.
